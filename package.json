@@ -1,7 +1,7 @@
 {
-  "name": "morfina-js",
+  "name": "morfina",
   "version": "0.0.0",
-  "description": "Morfina JS",
+  "description": "Morfina SDK",
   "main": "./dist/morfina-js.node.js",
   "types": "./dist/morfina-js.node.d.ts",
   "scripts": {
@@ -11,7 +11,7 @@
     "test-node": "npm run build && npm run test-node-run",
     "test-browser": "npm run build && npm run test-browser-run",
     "clean": "node ./tooling/clean",
-    "generate-tsd": "node ./tooling/generate-tsd morfina-js MorfinaJS morfina",
+    "generate-tsd": "node ./tooling/generate-tsd morfina-js Morfina morfina",
     "test-node-run": "webpack --config ./webpack.test.config.js && jasmine ./spec/build/tests.node.js",
     "test-browser-run": "webpack --config ./webpack.test.config.js --target-browser && karma start karma.conf.js --single-run",
     "preversion": "npm run build && npm run test-node-run && npm run test-browser-run",
