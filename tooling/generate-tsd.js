@@ -19,7 +19,7 @@ echo("Generating TSD files")
 echo("Using module name: " + moduleName)
 echo("Using internal module name: " + internalModuleName)
 echo("Generating Node.js TSD as master copy")
-exec("./node_modules/dts-generator/bin/dts-generator --types es6-promise --name "+moduleName+" --baseDir ./lib/ --out ./build/"+moduleName+".node.d.ts ./lib/*.ts")
+exec("./node_modules/dts-generator/bin/dts-generator --types es6-promise --name "+moduleName+" --baseDir ./src/ --out ./build/"+moduleName+".node.d.ts ./src/*.ts")
 echo("Copying SFX TSD")
 cp("-f",nodeTsdFile,sfxTsdFile)
 

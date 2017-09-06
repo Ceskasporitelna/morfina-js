@@ -1,4 +1,4 @@
-import * as Morfina from '../lib';
+import * as Morfina from '../src';
 
 describe('Morfina', () => {
   it('tests', () => {

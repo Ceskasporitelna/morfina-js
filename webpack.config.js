@@ -40,7 +40,7 @@ if (args.indexOf('--target-browser') != -1) {
 
 
 module.exports = {
-  entry: './lib/index.ts',
+  entry: './src/index.ts',
   output: {
     path: path.join(__dirname, 'build'),
     filename: outputFilename,
