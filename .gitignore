@@ -1,0 +1,5 @@
+node_modules
+jspm_packages
+build
+settings.json
+.DS_Store
