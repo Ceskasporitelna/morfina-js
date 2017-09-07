@@ -3,23 +3,23 @@ import Computer from './Computer';
 import Decryptor from './Decryptor';
 
 /**
- * Morfina Client
+ * MorfinaClient
  * 
- * @class Client
+ * @class MorfinaClient
  */
-class Client {
+class MorfinaClient {
   config: Config;
   computer: Computer;
   decryptor: Decryptor;
 
   /**
-   * Creates an instance of Client.
+   * Creates an instance of MorfinaClient.
    * @param {Config} config 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   constructor(config: Config) {
     if(!config) {
-      throw Error('You have to pass credentials to Client');
+      throw Error('You have to pass credentials to MorfinaClient');
     }
 
     this.config = config;
@@ -33,7 +33,7 @@ class Client {
    * @param {any} transformOptions
    * @returns {Promise<any>}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   morph = (data: any, transformOptions: any): Promise<any> => {}
 
@@ -42,7 +42,7 @@ class Client {
    * @param {number} numberOfPrimes
    * @returns {Promise<any>}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   precompute = (numberOfPrimes: number): Promise<any> => {
     return this.computer.precompute(numberOfPrimes);
@@ -54,7 +54,7 @@ class Client {
    * @param {string|number} value2
    * @returns {string}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   add = (value1: string|number, value2: string|number): string => {
     return this.computer.add(value1, value2);
@@ -66,7 +66,7 @@ class Client {
    * @param {number} num
    * @returns {string}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   multiply = (value: string, num: number): string => {
     return this.computer.multiply(value, num);
@@ -77,7 +77,7 @@ class Client {
    * @param {any} data
    * @returns {Promise<any>}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   decryptData = (data: any): Promise<any> => {
     return this.decryptor.decryptData(data);
@@ -88,11 +88,11 @@ class Client {
    * @param {string} field
    * @returns {Promise<any>}
    * 
-   * @memberof Client
+   * @memberof MorfinaClient
    */
   decryptField = (field: string): Promise<any> => {
     return this.decryptor.decryptField(field);
   }
 }
 
-export default Client;
+export default MorfinaClient;

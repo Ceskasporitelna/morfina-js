@@ -1,3 +1,3 @@
-import Client from './Client';
+import MorfinaClient from './Client';
 
-export default Client;
+export default MorfinaClient;
