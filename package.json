@@ -1,0 +1,83 @@
+{
+  "name": "morfina",
+  "version": "0.0.0",
+  "description": "Morfina SDK",
+  "main": "./dist/morfina-js.node.js",
+  "types": "./dist/morfina-js.node.d.ts",
+  "scripts": {
+    "dist": "npm run build && node ./tooling/dist",
+    "build": "npm run clean && webpack && webpack --target-browser && npm run generate-tsd",
+    "test": "npm run build && npm run test-node-run && npm run test-browser-run",
+    "test-node": "npm run build && npm run test-node-run",
+    "test-browser": "npm run build && npm run test-browser-run",
+    "clean": "node ./tooling/clean",
+    "generate-tsd": "node ./tooling/generate-tsd morfina-js Morfina morfina",
+    "test-node-run": "webpack --config ./webpack.test.config.js && jasmine ./spec/build/tests.node.js",
+    "test-browser-run": "webpack --config ./webpack.test.config.js --target-browser && karma start karma.conf.js --single-run",
+    "preversion": "npm run build && npm run test-node-run && npm run test-browser-run",
+    "version": "npm run dist && git add -A dist && git add CHANGELOG.md",
+    "postversion": "git push origin HEAD:master && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ceskasporitelna/morfina-js.git"
+  },
+  "homepage": "https://github.com/Ceskasporitelna/morfina-js#readme",
+  "contributors": [
+    {
+      "name": "CSAS Developers",
+      "email": "developers@csas.cz",
+      "url": "https://developers.csas.cz"
+    },
+    {
+      "name": "Petr Bažout",
+      "email": "petr.bazout@applifting.cz",
+      "url": "https://www.applifting.cz"
+    }
+  ],
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/Ceskasporitelna/morfina-js/issues"
+  },
+  "devDependencies": {
+    "babel-core": "^5.8.25",
+    "babel-loader": "^5.3.2",
+    "dts-generator": "https://github.com/Applifting/dts-generator.git#compiled-with-types-option",
+    "jasmine": "^2.4.1",
+    "jasmine-ajax": "^3.2.0",
+    "jasmine-core": "^2.4.1",
+    "json-loader": "^0.5.3",
+    "karma": "^0.13.19",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
+    "karma-sourcemap-loader": "^0.3.6",
+    "karma-webpack": "^1.7.0",
+    "nock": "^2.17.0",
+    "replace": "^0.3.0",
+    "semver": "^5.3.0",
+    "serve": "^1.4.0",
+    "shelljs": "^0.5.3",
+    "ts-loader": "^2.3.3",
+    "typescript": "^2.4.2",
+    "unminified-webpack-plugin": "^1.1.1",
+    "webpack": "^1.12.9"
+  },
+  "dependencies": {
+    "@slack/client": "^3.12.0",
+    "@types/crypto-js": "^3.1.32",
+    "@types/es6-promise": "0.0.32",
+    "@types/jasmine": "^2.5.53",
+    "@types/lodash": "^4.14.46",
+    "@types/nock": "^8.2.0",
+    "@types/node": "^6.0.58",
+    "@types/node-uuid": "0.0.28",
+    "@types/underscore": "^1.7.36",
+    "axios": "^0.8.1",
+    "crypto-js": "^3.1.5",
+    "date-fns": "^1.10.0",
+    "lodash": "^4.16.6",
+    "source-map-support": "^0.3.3",
+    "standard-error": "^1.1.0",
+    "uuid": "^3.0.1"
+  }
+}
