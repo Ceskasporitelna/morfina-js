@@ -5,7 +5,7 @@ class Computer {
     this.publicKey = publicKey;
   }
 
-  precompute = (numberOfPrimes: number): void => {}
+  precompute = (numberOfPrimes: number): Promise<any> => {}
 
   add = (value1: string|number, value2: string|number): string => {}
 

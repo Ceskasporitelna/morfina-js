@@ -17,9 +17,9 @@ class Client {
     this.computer = new Computer(credentials.publicKey);
   }
 
-  morph = (data: any, transformOptions: any) => {}
+  morph = (data: any, transformOptions: any): Promise<any> => {}
 
-  precompute = (numberOfPrimes: number): void => {
+  precompute = (numberOfPrimes: number): Promise<any> => {
     return this.computer.precompute(numberOfPrimes);
   }
 
