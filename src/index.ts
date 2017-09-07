@@ -1,1 +1,3 @@
-export const num = 3;
+import Client from './Client';
+
+export default Client;
