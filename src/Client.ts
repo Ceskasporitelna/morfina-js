@@ -1,20 +1,20 @@
-import { Credentials } from './model';
+import { Config } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
 
 class Client {
-  credentials: Credentials;
+  config: Config;
   computer: Computer;
   decryptor: Decryptor;
 
-  constructor(credentials: Credentials) {
-    if(!credentials) {
+  constructor(config: Config) {
+    if(!config) {
       throw Error('You have to pass credentials to Client');
     }
 
-    this.credentials = credentials;
-    this.decryptor = new Decryptor(credentials);
-    this.computer = new Computer(credentials.publicKey);
+    this.config = config;
+    this.decryptor = new Decryptor(config);
+    this.computer = new Computer(config.publicKey);
   }
 
   morph = (data: any, transformOptions: any): Promise<any> => {}

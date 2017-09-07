@@ -33,6 +33,11 @@ interface Credentials {
   aesKey?: string;
 }
 
+interface Config extends Credentials {
+  baseUrl?: string;
+}
+
 export {
   Credentials,
+  Config,
 }
