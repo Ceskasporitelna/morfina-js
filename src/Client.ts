@@ -73,7 +73,7 @@ class MorfinaClient {
   }
 
   /**
-   * Calls Morfina server with data to decrypt that are then returned decrypted
+   * Returns decrypted data that is passed in encrypted
    * @param {any} data
    * @returns {Promise<any>}
    * 
@@ -84,7 +84,7 @@ class MorfinaClient {
   }
   
   /**
-   * Calls Morfina server with field key to which key to decrypt
+   * Returns decrypted data by field key
    * @param {string} field
    * @returns {Promise<any>}
    * 
