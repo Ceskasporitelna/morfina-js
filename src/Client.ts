@@ -24,7 +24,7 @@ class MorfinaClient {
 
     this.config = config;
     this.decryptor = new Decryptor(config);
-    this.computer = new Computer(config.publicKey);
+    this.computer = new Computer(config.keypair.publicKey);
   }
 
   /**¨

@@ -28,9 +28,11 @@ interface Decryptor {
 
 interface Credentials {
   apiKey: string;
-  publicKey: string;
-  privateKey: string;
   aesKey?: string;
+  keypair: {
+    publicKey: string;
+    privateKey: string;
+  };
 }
 
 interface Config extends Credentials {
