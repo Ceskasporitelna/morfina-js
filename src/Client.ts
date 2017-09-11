@@ -25,6 +25,7 @@ class MorfinaClient {
    */
   constructor(config: Config, credentials: Credentials) {
     this.config = config;
+    this.credentials = credentials;
     this.decryptor = new Decryptor(this.credentials);
     this.computer = new Computer(this.credentials);
   }
