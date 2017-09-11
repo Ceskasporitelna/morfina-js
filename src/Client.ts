@@ -2,6 +2,7 @@ import * as axios from 'axios';
 import { Config, Credentials, AxiosResponse } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
+import { createCryptoConfiguration, getCryptoConfiguration } from './api';
 import { isObjectEmpty } from './utils';
 
 /**
@@ -41,17 +42,15 @@ class MorfinaClient {
    * @memberof MorfinaClient
    */
   static getClient = (config: Config): Promise<MorfinaClient> => {
-    return axios
-      .get(`${config.baseUrl}/morfina/api/v1/configuration/${config.webApiKey}`)
-      .then((resp: AxiosResponse<Credentials>) => {
-        if (!isObjectEmpty(resp.data)) {
-          return new MorfinaClient(config, resp.data);
+    return getCryptoConfiguration(config.baseUrl, config.webApiKey)
+      .then((resp) => {
+        if(!isObjectEmpty(resp.data)) {
+          return new MorfinaClient(config, resp.data) as any;
         }
 
-        return axios
-          .post(`${config.baseUrl}/morfina/api/v1/configuration/${config.webApiKey}/create`)
+        return createCryptoConfiguration(config.baseUrl, config.webApiKey);
       })
-      .then((resp: AxiosResponse<Credentials>) => {
+      .then(resp => {
         return new MorfinaClient(config, resp.data);
       });
   }
