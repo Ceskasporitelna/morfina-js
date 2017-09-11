@@ -1,1 +1,3 @@
-export const num = 3;
+import MorfinaClient from './Client';
+
+export default MorfinaClient;
