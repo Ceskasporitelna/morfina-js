@@ -42,14 +42,14 @@ class MorfinaClient {
    */
   static getClient = (config: Config): Promise<MorfinaClient> => {
     return axios
-      .get(`${config.baseUrl}/morfina/api/v1/configuration/${config.apiKey}`)
+      .get(`${config.baseUrl}/morfina/api/v1/configuration/${config.webApiKey}`)
       .then((resp: AxiosResponse<Credentials>) => {
         if (!isObjectEmpty(resp.data)) {
           return new MorfinaClient(config, resp.data);
         }
 
         return axios
-          .post(`${config.baseUrl}/morfina/api/v1/configuration/${config.apiKey}/create`)
+          .post(`${config.baseUrl}/morfina/api/v1/configuration/${config.webApiKey}/create`)
       })
       .then((resp: AxiosResponse<Credentials>) => {
         return new MorfinaClient(config, resp.data);

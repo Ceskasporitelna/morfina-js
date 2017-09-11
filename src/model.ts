@@ -51,7 +51,7 @@ interface Credentials {
 
 interface Config {
   baseUrl?: string;
-  apiKey: string;
+  webApiKey: string;
 }
 
 interface AxiosResponse<T> {
