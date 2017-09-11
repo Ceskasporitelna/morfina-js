@@ -24,10 +24,6 @@ class MorfinaClient {
    * @memberof MorfinaClient
    */
   constructor(config: Config, credentials: Credentials) {
-    if (!config) {
-      throw Error('You have to pass credentials to MorfinaClient');
-    }
-
     this.config = config;
     this.decryptor = new Decryptor(this.credentials);
     this.computer = new Computer(this.credentials);
@@ -42,6 +38,10 @@ class MorfinaClient {
    * @memberof MorfinaClient
    */
   static getClient = (config: Config): Promise<MorfinaClient> => {
+    if (!config) {
+      throw Error('You have to pass credentials to MorfinaClient');
+    }
+
     return getCryptoConfiguration(config.baseUrl, config.webApiKey)
       .then((resp) => {
         if(!isObjectEmpty(resp.data)) {
