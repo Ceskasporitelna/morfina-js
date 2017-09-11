@@ -1,3 +1,5 @@
+import { AxiosRequestConfig } from 'axios';
+
 interface Client {
   apiKey: string;
   publicKey: string;
@@ -27,19 +29,41 @@ interface Decryptor {
 }
 
 interface Credentials {
-  apiKey: string;
-  aesKey?: string;
-  keypair: {
-    publicKey: string;
-    privateKey: string;
+  PAILLIER: {
+    privateKey: {
+      preCalculatedDenominator: string;
+      lambda: string;
+    };
+    publicKey: {
+      nSquared: string;
+      g: string;
+      bits: number;
+      n: string;
+    };
   };
+  AES: {
+    password: string;
+    salt: string;
+    keyLength: number;
+    key: string;
+  }
 }
 
-interface Config extends Credentials {
+interface Config {
   baseUrl?: string;
+  apiKey: string;
+}
+
+interface AxiosResponse<T> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: any;
+  config: AxiosRequestConfig;
 }
 
 export {
   Credentials,
   Config,
+  AxiosResponse,
 }

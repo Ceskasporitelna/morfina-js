@@ -1,6 +1,8 @@
-import { Config } from './model';
+import * as axios from 'axios';
+import { Config, Credentials, AxiosResponse } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
+import { isObjectEmpty } from './utils';
 
 /**
  * MorfinaClient
@@ -11,20 +13,47 @@ class MorfinaClient {
   config: Config;
   computer: Computer;
   decryptor: Decryptor;
+  credentials: Credentials;
 
   /**
    * Creates an instance of MorfinaClient.
    * @param {Config} config 
+   * @param {Credentials} credentials
+   * 
    * @memberof MorfinaClient
    */
-  constructor(config: Config) {
-    if(!config) {
+  constructor(config: Config, credentials: Credentials) {
+    if (!config) {
       throw Error('You have to pass credentials to MorfinaClient');
     }
 
     this.config = config;
-    this.decryptor = new Decryptor(config);
-    this.computer = new Computer(config.keypair.publicKey);
+    this.decryptor = new Decryptor(this.credentials);
+    this.computer = new Computer(this.credentials);
+  }
+
+  /**
+   * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
+   * @param {Config} config
+   * @returns {Promise<MorfinaClient>}
+   * 
+   * @static
+   * @memberof MorfinaClient
+   */
+  static getClient = (config: Config): Promise<MorfinaClient> => {
+    return axios
+      .get(`${config.baseUrl}/morfina/api/v1/configuration/${config.apiKey}`)
+      .then((resp: AxiosResponse<Credentials>) => {
+        if (!isObjectEmpty(resp.data)) {
+          return new MorfinaClient(config, resp.data);
+        }
+
+        return axios
+          .post(`${config.baseUrl}/morfina/api/v1/configuration/${config.apiKey}/create`)
+      })
+      .then((resp: AxiosResponse<Credentials>) => {
+        return new MorfinaClient(config, resp.data);
+      });
   }
 
   /**¨
@@ -35,7 +64,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  morph = (data: any, transformOptions: any): Promise<any> => {}
+  morph = (data: any, transformOptions: any): Promise<any> => { }
 
   /**
    * Precompute values to make future invokations of encrypt and randomize (significantly) faster.
@@ -56,7 +85,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  add = (value1: string|number, value2: string|number): string => {
+  add = (value1: string | number, value2: string | number): string => {
     return this.computer.add(value1, value2);
   }
 
@@ -82,7 +111,7 @@ class MorfinaClient {
   decryptData = (data: any): Promise<any> => {
     return this.decryptor.decryptData(data);
   }
-  
+
   /**
    * Returns decrypted data by field key
    * @param {string} field
