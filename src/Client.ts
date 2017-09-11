@@ -1,6 +1,9 @@
-import { Config } from './model';
+import * as axios from 'axios';
+import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameterWithApiKey } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
+import ApiClient from './ApiClient';
+import { isObjectEmpty } from './utils';
 
 /**
  * MorfinaClient
@@ -11,31 +14,72 @@ class MorfinaClient {
   config: Config;
   computer: Computer;
   decryptor: Decryptor;
+  credentials: Credentials;
+  apiClient: ApiClient;
 
   /**
    * Creates an instance of MorfinaClient.
    * @param {Config} config 
-   * @memberof MorfinaClient
-   */
-  constructor(config: Config) {
-    if(!config) {
-      throw Error('You have to pass credentials to MorfinaClient');
-    }
-
-    this.config = config;
-    this.decryptor = new Decryptor(config);
-    this.computer = new Computer(config.keypair.publicKey);
-  }
-
-  /**¨
-   * Calls Morfina server with data and transformOptions where data are encrypted and sent back
-   * @param {any} data
-   * @param {any} transformOptions
-   * @returns {Promise<any>}
+   * @param {Credentials} credentials
    * 
    * @memberof MorfinaClient
    */
-  morph = (data: any, transformOptions: any): Promise<any> => {}
+  constructor(config: Config, credentials: Credentials) {
+    this.config = config;
+    this.credentials = credentials;
+    this.decryptor = new Decryptor(this.credentials);
+    this.computer = new Computer(this.credentials);
+    this.apiClient = new ApiClient(config);
+  }
+
+  /**
+   * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
+   * @param {Config} config
+   * @returns {Promise<MorfinaClient>}
+   * 
+   * @static
+   * @memberof MorfinaClient
+   */
+  static getClient = (config: Config): Promise<MorfinaClient> => {
+    let client = new ApiClient(config);
+
+    if (!config) {
+      throw Error('You have to pass credentials to MorfinaClient');
+    }
+
+    return client.getCryptoConfiguration()
+      .then((resp) => {
+        if(!isObjectEmpty(resp.data)) {
+          client = undefined;
+          return new MorfinaClient(config, resp.data) as any;
+        }
+
+        return client.createCryptoConfiguration();
+      })
+      .then(resp => {
+        client = undefined;
+        return new MorfinaClient(config, resp.data);
+      });
+  }
+
+  /**¨
+   * Calls Morfina server with payload where data are encrypted and sent back
+   * @param {EncryptPayloadWithoutApiKeys} payload
+   * @returns {Promise<AxiosResponse<any>>}
+   * 
+   * @memberof MorfinaClient
+   */
+  morph = (payload: EncryptPayloadWithoutApiKeys): Promise<AxiosResponse<any>> => {
+    const payloadWithApiKeys = {
+      encryptionParameters: payload.encryptionParameters.map((x: EncryptionParameterWithApiKey) => {
+        x.webAPIKey = this.config.webApiKey;
+        return x;
+      }),
+      dataArray: payload.dataArray,
+    };
+
+    return this.apiClient.encryptData(payloadWithApiKeys);
+  }
 
   /**
    * Precompute values to make future invokations of encrypt and randomize (significantly) faster.
@@ -56,7 +100,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  add = (value1: string|number, value2: string|number): string => {
+  add = (value1: string | number, value2: string | number): string => {
     return this.computer.add(value1, value2);
   }
 
@@ -82,7 +126,7 @@ class MorfinaClient {
   decryptData = (data: any): Promise<any> => {
     return this.decryptor.decryptData(data);
   }
-  
+
   /**
    * Returns decrypted data by field key
    * @param {string} field

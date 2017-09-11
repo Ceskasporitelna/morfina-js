@@ -1,8 +1,10 @@
-class Computer {
-  publicKey: string;
+import { Credentials } from './model';
 
-  constructor(publicKey: string) {
-    this.publicKey = publicKey;
+class Computer {
+  credentials: Credentials;
+
+  constructor(credentials: Credentials) {
+    this.credentials = credentials;
   }
 
   precompute = (numberOfPrimes: number): Promise<any> => {}

@@ -1,45 +1,64 @@
-interface Client {
-  apiKey: string;
-  publicKey: string;
-  privateKey: string;
-  aesKey?: string;
-  computer: Computer;
-  decryptor: Decryptor;
-
-  constructor: (credentials: Credentials) => void;
-  morph: (data: any, options: any) => Promise<any>;
-}
-
-interface Computer {
-  publicKey: string;
-  paillier: any;
-
-  constructor: (publicKey: string) => void;
-  precompute: (numberOfPrimes: number) => void;
-  add: (value1: string|number, value2: string|number) => void;
-  multiply: (value: string, num: number) => void;
-}
-
-interface Decryptor {
-  constructor: (credentials: Credentials) => void;
-  decrypt: (data: any) => Promise<void>;
-  decryptField: (field: string) => Promise<void>;
-}
+import { AxiosRequestConfig } from 'axios';
 
 interface Credentials {
-  apiKey: string;
-  aesKey?: string;
-  keypair: {
-    publicKey: string;
-    privateKey: string;
+  PAILLIER: {
+    privateKey: {
+      preCalculatedDenominator: string;
+      lambda: string;
+    };
+    publicKey: {
+      nSquared: string;
+      g: string;
+      bits: number;
+      n: string;
+    };
   };
+  AES: {
+    password: string;
+    salt: string;
+    keyLength: number;
+    key: string;
+  }
 }
 
-interface Config extends Credentials {
+interface Config {
   baseUrl?: string;
+  webApiKey: string;
+}
+
+interface AxiosResponse<T> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: any;
+  config: AxiosRequestConfig;
+}
+
+interface EncryptionParameter {
+  encryptionType: string;
+  jsonPath: string;
+}
+
+interface EncryptionParameterWithApiKey extends EncryptionParameter {
+  webAPIKey: string;
+}
+
+interface EncryptPayload {
+  encryptionParameters: EncryptionParameterWithApiKey[];
+  dataArray: any;
+}
+
+interface EncryptPayloadWithoutApiKeys {
+  encryptionParameters: EncryptionParameter[];
+  dataArray: any;
 }
 
 export {
   Credentials,
   Config,
+  AxiosResponse,
+  EncryptionParameter,
+  EncryptionParameterWithApiKey,
+  EncryptPayload,
+  EncryptPayloadWithoutApiKeys,
 }
