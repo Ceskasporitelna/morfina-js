@@ -34,8 +34,31 @@ interface AxiosResponse<T> {
   config: AxiosRequestConfig;
 }
 
+interface EncryptionParameter {
+  encryptionType: string;
+  jsonPath: string;
+}
+
+interface EncryptionParameterWithApiKey extends EncryptionParameter {
+  webAPIKey: string;
+}
+
+interface EncryptPayload {
+  encryptionParameters: EncryptionParameterWithApiKey[];
+  dataArray: any;
+}
+
+interface EncryptPayloadWithoutApiKeys {
+  encryptionParameters: EncryptionParameter[];
+  dataArray: any;
+}
+
 export {
   Credentials,
   Config,
   AxiosResponse,
+  EncryptionParameter,
+  EncryptionParameterWithApiKey,
+  EncryptPayload,
+  EncryptPayloadWithoutApiKeys,
 }

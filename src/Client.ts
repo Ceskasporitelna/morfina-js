@@ -1,8 +1,8 @@
 import * as axios from 'axios';
-import { Config, Credentials, AxiosResponse } from './model';
+import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameterWithApiKey } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
-import { createCryptoConfiguration, getCryptoConfiguration } from './api';
+import { createCryptoConfiguration, getCryptoConfiguration, encryptData } from './api';
 import { isObjectEmpty } from './utils';
 
 /**
@@ -57,14 +57,23 @@ class MorfinaClient {
   }
 
   /**¨
-   * Calls Morfina server with data and transformOptions where data are encrypted and sent back
-   * @param {any} data
-   * @param {any} transformOptions
-   * @returns {Promise<any>}
+   * Calls Morfina server with payload where data are encrypted and sent back
+   * @param {EncryptPayloadWithoutApiKeys} payload
+   * @returns {Promise<AxiosResponse<any>>}
    * 
    * @memberof MorfinaClient
    */
-  morph = (data: any, transformOptions: any): Promise<any> => { }
+  morph = (payload: EncryptPayloadWithoutApiKeys): Promise<AxiosResponse<any>> => {
+    const payloadWithApiKeys = {
+      encryptionParameters: payload.encryptionParameters.map((x: EncryptionParameterWithApiKey) => {
+        x.webAPIKey = this.config.webApiKey;
+        return x;
+      }),
+      dataArray: payload.dataArray,
+    };
+
+    return encryptData(this.config.baseUrl, this.config.webApiKey, payloadWithApiKeys);
+  }
 
   /**
    * Precompute values to make future invokations of encrypt and randomize (significantly) faster.
