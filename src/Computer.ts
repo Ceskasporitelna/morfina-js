@@ -19,9 +19,29 @@ class Computer {
     return Promise.resolve(this.publicKey.precompute(numberOfPrimes));
   }
 
-  add = (value1: string|number, value2: string|number): string => {}
+  add = (value1: string | number, value2: string | number): string => {
+    return this.publicKey.add(
+      this.getEncryptedStringFromValue(value1),
+      this.getEncryptedStringFromValue(value2),
+    );
+  }
 
   multiply = (value: string, num: number): string => {}
+
+  private getEncryptedStringFromValue = (val: string | number): string => {
+    
+      if(typeof val === 'string') {
+        return val as string;
+      }
+        
+      if(typeof val === 'number') {
+        const bigInt = new BigInteger(val, 10);
+        return this.publicKey.encrypt(bigInt);
+      }
+
+      throw Error('Input must be number or string');
+    }
+  }
 }
 
 export default Computer;
