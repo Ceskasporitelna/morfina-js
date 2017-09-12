@@ -35,7 +35,7 @@ class MorfinaClient {
     const priv = new paillier.privateKey(new BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
 
     this.computer = new Computer(pub, priv);
-    this.decryptor = new Decryptor(this.credentials);
+    this.decryptor = new Decryptor(this.credentials, pub, priv);
   }
 
   /**

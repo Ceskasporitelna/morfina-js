@@ -1,10 +1,14 @@
 import { Credentials } from './model';
 
 class Decryptor {
-  credentials: Credentials;
+  private credentials: Credentials;
+  private publicKey: any;
+  private privateKey: any;
 
-  constructor(credentials: Credentials) {
+  constructor(credentials: Credentials, publicKey, privateKey) {
     this.credentials = credentials;
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
   }
 
   decryptData = (data: any): Promise<any> => {}
