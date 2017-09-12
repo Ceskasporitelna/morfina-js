@@ -62,10 +62,6 @@ class Computer {
     ).toString();
   }
 
-  decrypt = (val: any) => {
-    return this.privateKey.decrypt(new BigInteger(val)).toString(10);
-  }
-
   /**
    * Returns string if val is string. If val is number then it returns encrypted BigInteger.
    * @param {string | number} val
