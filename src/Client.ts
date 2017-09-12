@@ -125,7 +125,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  multiply = (value: string | number, num: string | number): string => {
+  multiply = (value: string | number, num: number): string => {
     return this.computer.multiply(value, num);
   }
 
