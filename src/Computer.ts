@@ -3,9 +3,9 @@ import { BigInteger } from 'jsbn';
 import { Credentials } from './model';
 
 class Computer {
-  credentials: Credentials;
-  publicKey: any;
-  privateKey: any;
+  private credentials: Credentials;
+  private publicKey: any;
+  private privateKey: any;
 
   constructor(credentials: Credentials) {
     const { publicKey, privateKey } = credentials.PAILLIER;
