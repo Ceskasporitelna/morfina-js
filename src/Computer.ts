@@ -8,7 +8,6 @@ import { Credentials } from './model';
  * @class Computer
  */
 class Computer {
-  private credentials: Credentials;
   private publicKey: any;
   private privateKey: any;
 
@@ -17,12 +16,9 @@ class Computer {
    * @param {Credentials} credentials 
    * @memberof Computer
    */
-  constructor(credentials: Credentials) {
-    const { publicKey, privateKey } = credentials.PAILLIER;
-
-    this.credentials = credentials;
-    this.publicKey = new paillier.publicKey(publicKey.bits, new BigInteger(publicKey.n));
-    this.privateKey = new paillier.privateKey(new BigInteger(privateKey.lambda), this.publicKey);
+  constructor(publicKey, privateKey) {
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
   }
 
   /**
@@ -70,6 +66,14 @@ class Computer {
     return this.privateKey.decrypt(new BigInteger(val)).toString(10);
   }
 
+  /**
+   * Returns string if val is string. If val is number then it returns encrypted BigInteger.
+   * @param {string | number} val
+   * @returns {string}
+   * 
+   * @private
+   * @memberof Computer
+   */
   private getEncryptedStringFromValue = (val: string | number): string => {
     if (typeof val === 'string') {
       return val as string;

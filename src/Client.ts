@@ -1,4 +1,6 @@
 import * as axios from 'axios';
+import * as paillier from '../lib/paillier';
+import { BigInteger } from 'jsbn';
 import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameterWithApiKey } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
@@ -27,9 +29,13 @@ class MorfinaClient {
   constructor(config: Config, credentials: Credentials) {
     this.config = config;
     this.credentials = credentials;
-    this.decryptor = new Decryptor(this.credentials);
-    this.computer = new Computer(this.credentials);
     this.apiClient = new ApiClient(config);
+
+    const pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new BigInteger(credentials.PAILLIER.publicKey.n));
+    const priv = new paillier.privateKey(new BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
+
+    this.computer = new Computer(pub, priv);
+    this.decryptor = new Decryptor(this.credentials);
   }
 
   /**
@@ -58,7 +64,10 @@ class MorfinaClient {
           .then(resp => {
             client = undefined;
             return new MorfinaClient(config, resp.data);
-          });
+          }).catch(err => {
+            console.log(err);
+            return null as any;
+          })
       })
       .catch(err => {
         console.log(err);
@@ -116,7 +125,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  multiply = (value: string, num: number): string => {
+  multiply = (value: string | number, num: string | number): string => {
     return this.computer.multiply(value, num);
   }
 
