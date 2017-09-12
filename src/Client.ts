@@ -54,12 +54,16 @@ class MorfinaClient {
           return new MorfinaClient(config, resp.data) as any;
         }
 
-        return client.createCryptoConfiguration();
+        return client.createCryptoConfiguration()
+          .then(resp => {
+            client = undefined;
+            return new MorfinaClient(config, resp.data);
+          });
       })
-      .then(resp => {
-        client = undefined;
-        return new MorfinaClient(config, resp.data);
-      });
+      .catch(err => {
+        console.log(err);
+        return null as any;
+      })
   }
 
   /**¨
