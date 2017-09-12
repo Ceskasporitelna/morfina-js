@@ -2,11 +2,21 @@ import * as paillier from '../lib/paillier';
 import { BigInteger } from 'jsbn';
 import { Credentials } from './model';
 
+/**
+ * 
+ * 
+ * @class Computer
+ */
 class Computer {
   private credentials: Credentials;
   private publicKey: any;
   private privateKey: any;
 
+  /**
+   * Creates an instance of Computer.
+   * @param {Credentials} credentials 
+   * @memberof Computer
+   */
   constructor(credentials: Credentials) {
     const { publicKey, privateKey } = credentials.PAILLIER;
 
@@ -15,10 +25,25 @@ class Computer {
     this.privateKey = new paillier.privateKey(new BigInteger(privateKey.lambda), this.publicKey);
   }
 
+  /**
+   * Precompute values to make future invokations of encrypt and randomize (significantly) faster.
+   * @param {number} numberOfPrimes
+   * @returns {Promise<any>}
+   * 
+   * @memberof Computer
+   */
   precompute = (numberOfPrimes: number): Promise<any> => {
     return Promise.resolve(this.publicKey.precompute(numberOfPrimes));
   }
 
+  /**
+   * Returns sum of value1 and value2
+   * @param {string|number} value1
+   * @param {string|number} value2
+   * @returns {string}
+   * 
+   * @memberof Computer
+   */
   add = (value1: string | number, value2: string | number): string => {
     return this.publicKey.add(
       this.getEncryptedStringFromValue(value1),
@@ -26,7 +51,15 @@ class Computer {
     ).toString();
   }
 
-  multiply = (value: string | number, num: string | number): string => {
+  /**
+   * Returns multiplication of value by num
+   * @param {string|number} value
+   * @param {number} num
+   * @returns {string}
+   * 
+   * @memberof Computer
+   */
+  multiply = (value: string | number, num: number): string => {
     return this.publicKey.mult(
       this.getEncryptedStringFromValue(value),
       new BigInteger(num.toString(), 10)
