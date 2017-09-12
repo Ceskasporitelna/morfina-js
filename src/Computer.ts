@@ -15,7 +15,9 @@ class Computer {
     this.privateKey = new paillier.privateKey(new BigInteger(privateKey.lambda), this.publicKey);
   }
 
-  precompute = (numberOfPrimes: number): Promise<any> => {}
+  precompute = (numberOfPrimes: number): Promise<any> => {
+    return Promise.resolve(this.publicKey.precompute(numberOfPrimes));
+  }
 
   add = (value1: string|number, value2: string|number): string => {}
 
