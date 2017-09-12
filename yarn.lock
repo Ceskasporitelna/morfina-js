@@ -31,6 +31,10 @@
   version "2.5.54"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.54.tgz#a6b5f2ae2afb6e0307774e8c7c608e037d491c63"
 
+"@types/jsonpath@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@types/jsonpath/-/jsonpath-0.2.0.tgz#13c62db22a34d9c411364fac79fd374d63445aa1"
+
 "@types/lodash@^4.14.46":
   version "4.14.74"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.74.tgz#ac3bd8db988e7f7038e5d22bd76a7ba13f876168"
@@ -58,6 +62,10 @@
 "@types/underscore@^1.7.36":
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.2.tgz#42a313784a8611cf425038cf0e33f4e8d79c9fca"
+
+JSONSelect@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/JSONSelect/-/JSONSelect-0.4.0.tgz#a08edcc67eb3fcbe99ed630855344a0cf282bb8d"
 
 abbrev@1:
   version "1.1.0"
@@ -601,6 +609,10 @@ chokidar@^1.0.0, chokidar@^1.4.1:
   optionalDependencies:
     fsevents "^1.0.0"
 
+cjson@~0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/cjson/-/cjson-0.2.1.tgz#73cd8aad65d9e1505f9af1744d3b79c1527682a5"
+
 clean-css@^3.1.9:
   version "3.4.28"
   resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-3.4.28.tgz#bf1945e82fc808f55695e6ddeaec01400efd03ff"
@@ -967,6 +979,10 @@ domain-browser@^1.1.1:
     glob "7.0.0"
     mkdirp "0.5.1"
 
+ebnf-parser@~0.1.9:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/ebnf-parser/-/ebnf-parser-0.1.10.tgz#cd1f6ba477c5638c40c97ed9b572db5bab5d8331"
+
 ecc-jsbn@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz#0fc73a9ed5f0d53c38193398523ef7e543777505"
@@ -1059,9 +1075,35 @@ escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
+escodegen@0.0.21:
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/escodegen/-/escodegen-0.0.21.tgz#53d652cfa1030388279458a5266c5ffc709c63c3"
+  dependencies:
+    esprima "~1.0.2"
+    estraverse "~0.0.4"
+  optionalDependencies:
+    source-map ">= 0.1.2"
+
+escodegen@~0.0.24:
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/escodegen/-/escodegen-0.0.28.tgz#0e4ff1715f328775d6cab51ac44a406cd7abffd3"
+  dependencies:
+    esprima "~1.0.2"
+    estraverse "~1.3.0"
+  optionalDependencies:
+    source-map ">= 0.1.2"
+
 esprima-fb@~15001.1001.0-dev-harmony-fb:
   version "15001.1001.0-dev-harmony-fb"
   resolved "https://registry.yarnpkg.com/esprima-fb/-/esprima-fb-15001.1001.0-dev-harmony-fb.tgz#43beb57ec26e8cf237d3dd8b33e42533577f2659"
+
+esprima@1.0.x, esprima@~1.0.2:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/esprima/-/esprima-1.0.4.tgz#9f557e08fc3b4d26ece9dd34f8fbf476b62585ad"
+
+esprima@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/esprima/-/esprima-1.2.2.tgz#76a0fd66fcfe154fd292667dc264019750b1657b"
 
 esprima@^2.6.0:
   version "2.7.3"
@@ -1070,6 +1112,14 @@ esprima@^2.6.0:
 esprima@~3.1.0:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
+
+estraverse@~0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-0.0.4.tgz#01a0932dfee574684a598af5a67c3bf9b6428db2"
+
+estraverse@~1.3.0:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-1.3.2.tgz#37c2b893ef13d723f276d878d60d8535152a6c42"
 
 esutils@^2.0.0:
   version "2.0.2"
@@ -1614,6 +1664,26 @@ jasmine@^2.4.1:
     glob "^7.0.6"
     jasmine-core "~2.8.0"
 
+jison-lex@0.2.x:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jison-lex/-/jison-lex-0.2.1.tgz#ac4b815e8cce5132eb12b5dfcfe8d707b8844dfe"
+  dependencies:
+    lex-parser "0.1.x"
+    nomnom "1.5.2"
+
+jison@0.4.13:
+  version "0.4.13"
+  resolved "https://registry.yarnpkg.com/jison/-/jison-0.4.13.tgz#9041707d62241367f58834532b9f19c2c36fac78"
+  dependencies:
+    JSONSelect "0.4.0"
+    cjson "~0.2.1"
+    ebnf-parser "~0.1.9"
+    escodegen "0.0.21"
+    esprima "1.0.x"
+    jison-lex "0.2.x"
+    lex-parser "~0.1.3"
+    nomnom "1.5.2"
+
 js-tokens@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-1.0.1.tgz#cc435a5c8b94ad15acb7983140fc80182c89aeae"
@@ -1663,6 +1733,15 @@ json5@^0.5.0:
 jsonify@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
+
+jsonpath@^0.2.12:
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/jsonpath/-/jsonpath-0.2.12.tgz#5bf9d911fb4616c1e3370beceb9f0db24ae34cd2"
+  dependencies:
+    esprima "1.2.2"
+    jison "0.4.13"
+    static-eval "0.2.3"
+    underscore "1.7.0"
 
 jsprim@^1.2.2:
   version "1.4.1"
@@ -1781,6 +1860,10 @@ less@~2.7.1:
 leven@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/leven/-/leven-1.0.2.tgz#9144b6eebca5f1d0680169f1a6770dcea60b75c3"
+
+lex-parser@0.1.x, lex-parser@~0.1.3:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/lex-parser/-/lex-parser-0.1.4.tgz#64c4f025f17fd53bfb45763faeb16f015a747550"
 
 loader-utils@^0.2.11, loader-utils@^0.2.5, loader-utils@^0.2.9:
   version "0.2.17"
@@ -2003,6 +2086,13 @@ node.extend@~2.0.0:
   resolved "https://registry.yarnpkg.com/node.extend/-/node.extend-2.0.0.tgz#7525a2875677ea534784a5e10ac78956139614df"
   dependencies:
     is "^3.2.1"
+
+nomnom@1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/nomnom/-/nomnom-1.5.2.tgz#f4345448a853cfbd5c0d26320f2477ab0526fe2f"
+  dependencies:
+    colors "0.5.x"
+    underscore "1.1.x"
 
 nomnom@1.6.x:
   version "1.6.2"
@@ -2651,7 +2741,7 @@ source-map@0.4.x, source-map@~0.4.1:
   dependencies:
     amdefine ">=0.0.4"
 
-source-map@^0.5.0, source-map@^0.5.3, source-map@~0.5.0, source-map@~0.5.1:
+"source-map@>= 0.1.2", source-map@^0.5.0, source-map@^0.5.3, source-map@~0.5.0, source-map@~0.5.1:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
 
@@ -2680,6 +2770,12 @@ stack-trace@0.0.x:
 standard-error@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/standard-error/-/standard-error-1.1.0.tgz#23e5168fa1c0820189e5812701a79058510d0d34"
+
+static-eval@0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/static-eval/-/static-eval-0.2.3.tgz#023f17ac9fee426ea788c12ea39206dc175f8b2a"
+  dependencies:
+    escodegen "~0.0.24"
 
 "statuses@>= 1.3.1 < 2", statuses@~1.3.1:
   version "1.3.1"
@@ -2938,6 +3034,14 @@ uid-number@^0.0.6:
 ultron@1.0.x:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.0.2.tgz#ace116ab557cd197386a4e88f4685378c8b2e4fa"
+
+underscore@1.1.x:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.1.7.tgz#40bab84bad19d230096e8d6ef628bff055d83db0"
+
+underscore@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.7.0.tgz#6bbaf0877500d36be34ecaa584e0db9fef035209"
 
 underscore@~1.4.4:
   version "1.4.4"
