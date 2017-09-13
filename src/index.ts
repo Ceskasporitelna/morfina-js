@@ -30,13 +30,15 @@ async function init() {
     const result = await client.morph(payload);
     const encrypted = client.computer.getEncryptedStringFromValue(payload.dataArray.transactions[0].amount.value);
     const decrypted = await client.decryptField(encrypted, null);
-    const decryptedServer = await client.decryptField(result.data.dataArray.transactions[0].amount.value, null);
+    const decryptedServer = await client.decryptData(result.data);
+
+    // console.log(result.data.dataArray.transactions[0].amount);
 
     console.log(`
       Original value:               ${payload.dataArray.transactions[0].amount.value}
       Encrypted from server:        ${result.data.dataArray.transactions[0].amount.value}
       Encrypted locally:            ${encrypted}
-      Decrypted from server:        ${decryptedServer}
+      Decrypted from server:        ${decryptedServer.transactions[0].amount.value}
       Decrypted from local encrypt: ${decrypted}
     `);
 
