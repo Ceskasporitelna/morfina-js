@@ -70,14 +70,14 @@ class Computer {
    * @private
    * @memberof Computer
    */
-  private getEncryptedStringFromValue = (val: string | number): string => {
+  public getEncryptedStringFromValue = (val: string | number): string => {
     if (typeof val === 'string') {
       return val as string;
     }
 
     if (typeof val === 'number') {
       const bigInt = new BigInteger(val.toString(), 10);
-      return this.publicKey.encrypt(bigInt);
+      return this.publicKey.encrypt(bigInt).toString();
     }
 
     throw Error('Input must be number or string');
