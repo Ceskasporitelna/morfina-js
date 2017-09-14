@@ -1,5 +1,15 @@
 import * as axios from 'axios';
-import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameterWithApiKey } from './model';
+import * as paillier from '../lib/paillier';
+import { BigInteger } from 'jsbn';
+import {
+  Config,
+  Credentials,
+  AxiosResponse,
+  EncryptPayload,
+  EncryptPayloadWithoutApiKeys,
+  EncryptionParameterWithApiKey,
+  EncryptionParameter,
+} from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
 import ApiClient from './ApiClient';
@@ -27,9 +37,13 @@ class MorfinaClient {
   constructor(config: Config, credentials: Credentials) {
     this.config = config;
     this.credentials = credentials;
-    this.decryptor = new Decryptor(this.credentials);
-    this.computer = new Computer(this.credentials);
     this.apiClient = new ApiClient(config);
+    
+    const pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new BigInteger(credentials.PAILLIER.publicKey.n));
+    const priv = new paillier.privateKey(new BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
+
+    this.computer = new Computer(pub, priv);
+    this.decryptor = new Decryptor(this.credentials, pub, priv);
   }
 
   /**
@@ -54,12 +68,19 @@ class MorfinaClient {
           return new MorfinaClient(config, resp.data) as any;
         }
 
-        return client.createCryptoConfiguration();
+        return client.createCryptoConfiguration()
+          .then(resp => {
+            client = undefined;
+            return new MorfinaClient(config, resp.data);
+          }).catch(err => {
+            console.log(err);
+            return null as any;
+          })
       })
-      .then(resp => {
-        client = undefined;
-        return new MorfinaClient(config, resp.data);
-      });
+      .catch(err => {
+        console.log(err);
+        return null as any;
+      })
   }
 
   /**¨
@@ -78,7 +99,11 @@ class MorfinaClient {
       dataArray: payload.dataArray,
     };
 
-    return this.apiClient.encryptData(payloadWithApiKeys);
+    return this.apiClient.encryptData(payloadWithApiKeys).then(resp => {
+      // console.log(resp.data.paillier, this.credentials.PAILLIER);
+
+      return resp;
+    });
   }
 
   /**
@@ -112,30 +137,31 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  multiply = (value: string, num: number): string => {
+  multiply = (value: string | number, num: number): string => {
     return this.computer.multiply(value, num);
   }
 
   /**
    * Returns decrypted data that is passed in encrypted
-   * @param {any} data
+   * @param {EncryptPayload} data
    * @returns {Promise<any>}
    * 
    * @memberof MorfinaClient
    */
-  decryptData = (data: any): Promise<any> => {
+  decryptData = (data: EncryptPayload): Promise<any> => {
     return this.decryptor.decryptData(data);
   }
 
   /**
    * Returns decrypted data by field key
-   * @param {string} field
-   * @returns {Promise<any>}
+   * @param {object|string} data
+   * @param {EncryptionParameters} encryptionParameters
+   * @returns {Promise<object|string>}
    * 
    * @memberof MorfinaClient
    */
-  decryptField = (field: string): Promise<any> => {
-    return this.decryptor.decryptField(field);
+  decryptField = (data: object | string, encryptionParameters: EncryptionParameter): Promise<object|string> => {
+    return this.decryptor.decryptField(data, encryptionParameters);
   }
 }
 
