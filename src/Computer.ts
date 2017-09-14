@@ -58,7 +58,7 @@ class Computer {
   multiply = (value: string | number, num: number): string => {
     return this.publicKey.mult(
       this.getEncryptedBigIntegerFromValue(value),
-      this.getEncryptedBigIntegerFromValue(num)
+      new BigInteger(num.toString(), 10)
     ).toString();
   }
 
