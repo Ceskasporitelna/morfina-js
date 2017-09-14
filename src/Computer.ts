@@ -62,6 +62,8 @@ class Computer {
     ).toString();
   }
 
+  encrypt = (x) => this.getEncryptedStringFromValue(x).toString();
+
   /**
    * Returns string if val is string. If val is number then it returns encrypted BigInteger.
    * @param {string | number} val

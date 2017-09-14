@@ -38,7 +38,7 @@ class MorfinaClient {
     this.config = config;
     this.credentials = credentials;
     this.apiClient = new ApiClient(config);
-
+    
     const pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new BigInteger(credentials.PAILLIER.publicKey.n));
     const priv = new paillier.privateKey(new BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
 
