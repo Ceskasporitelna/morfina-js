@@ -42,8 +42,8 @@ class Computer {
    */
   add = (value1: string | number, value2: string | number): string => {
     return this.publicKey.add(
-      this.getEncryptedStringFromValue(value1),
-      this.getEncryptedStringFromValue(value2)
+      this.getEncryptedBigIntegerFromValue(value1),
+      this.getEncryptedBigIntegerFromValue(value2)
     ).toString();
   }
 
@@ -57,29 +57,30 @@ class Computer {
    */
   multiply = (value: string | number, num: number): string => {
     return this.publicKey.mult(
-      this.getEncryptedStringFromValue(value),
-      new BigInteger(num.toString(), 10)
+      this.getEncryptedBigIntegerFromValue(value),
+      this.getEncryptedBigIntegerFromValue(num)
     ).toString();
   }
 
-  encrypt = (x) => this.getEncryptedStringFromValue(x).toString();
+  encrypt = (x) => this.getEncryptedBigIntegerFromValue(x).toString();
 
   /**
-   * Returns string if val is string. If val is number then it returns encrypted BigInteger.
+   * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
+   * If passed in values is number then in returns decrypted BigInteger.
    * @param {string | number} val
-   * @returns {string}
+   * @returns {BigInteger}
    * 
    * @private
    * @memberof Computer
    */
-  public getEncryptedStringFromValue = (val: string | number): string => {
+  private getEncryptedBigIntegerFromValue = (val: string | number): string => {
     if (typeof val === 'string') {
-      return val as string;
+      return new BigInteger(val, 10);
     }
 
     if (typeof val === 'number') {
       const bigInt = new BigInteger(val.toString(), 10);
-      return this.publicKey.encrypt(bigInt).toString();
+      return this.publicKey.encrypt(bigInt);
     }
 
     throw Error('Input must be number or string');
