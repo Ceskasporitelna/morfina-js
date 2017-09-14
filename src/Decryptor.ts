@@ -45,14 +45,28 @@ class Decryptor {
   }
 
   /**
-   * @param {EncryptPayload} data
+   * @param {object|string} data
    * @param {EncryptionParameters} encryptionParameters
-   * @returns {Promise<any>}
+   * @returns {Promise<object|string>}
    * 
    * @memberof Decryptor
    */
-  decryptField = (data: EncryptPayload, encryptionParameters: EncryptionParameter): Promise<any> => {
-    return this.privateKey.decrypt(new BigInteger(data.toString())).toString(10);
+  decryptField = (data: object | string, encryptionParameters: EncryptionParameter): Promise<object|string> => {
+    // return this.privateKey.decrypt(new BigInteger(data.toString())).toString(10);
+    if(!encryptionParameters) {
+      throw Error('You have to provide encryptionParameters as second argument');
+    }
+
+    if(typeof data === 'object' && encryptionParameters.jsonPath) {
+      const dataCopy = JSON.parse(JSON.stringify(data));
+      const decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
+                                .map(x => this.decryptVal(x, encryptionParameters.encryptionType));
+
+      return Promise.resolve(decryptedValues);
+    }
+
+    const decryptedValue = this.decryptVal(data, encryptionParameters.encryptionType);
+    return Promise.resolve(decryptedValue);
   }
 
   /**

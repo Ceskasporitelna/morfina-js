@@ -154,13 +154,13 @@ class MorfinaClient {
 
   /**
    * Returns decrypted data by field key
-   * @param {any} data
-   * @param {EncryptionParameter} encryptionParameters
-   * @returns {Promise<any>}
+   * @param {object|string} data
+   * @param {EncryptionParameters} encryptionParameters
+   * @returns {Promise<object|string>}
    * 
    * @memberof MorfinaClient
    */
-  decryptField = (data: any, encryptionParameters: EncryptionParameter): Promise<any> => {
+  decryptField = (data: object | string, encryptionParameters: EncryptionParameter): Promise<object|string> => {
     return this.decryptor.decryptField(data, encryptionParameters);
   }
 }
