@@ -5,8 +5,9 @@ import { Credentials, AxiosResponse, EncryptPayload, Config } from './model';
  * 
  * @class ApiClient
  */
-class ApiClient {
+export abstract class ApiClient {
   config: Config;
+  public static headers: object = {};
 
   /**
    * Creates an instance of ApiClient.
@@ -24,7 +25,7 @@ class ApiClient {
    * @memberof ApiClient
    */
   createCryptoConfiguration = (): Promise<AxiosResponse<Credentials>> => {
-    return axios.post(`${this.config.baseUrl}/morfina/api/v1/configuration/${this.config.webApiKey}/create`);
+    return axios.post(`${this.config.baseUrl}/morfina/api/v1/configuration/${this.config.webApiKey}/create`, null, { headers: ApiClient.headers });
   }
 
   /**
@@ -34,7 +35,7 @@ class ApiClient {
    * @memberof ApiClient
    */
   getCryptoConfiguration = (): Promise<AxiosResponse<Credentials>> => {
-    return axios.get(`${this.config.baseUrl}/morfina/api/v1/configuration/${this.config.webApiKey}`);
+    return axios.get(`${this.config.baseUrl}/morfina/api/v1/configuration/${this.config.webApiKey}`, { headers: ApiClient.headers });
   }
 
   /**
@@ -44,9 +45,13 @@ class ApiClient {
    * 
    * @memberof ApiClient
    */
-  encryptData = (payload: EncryptPayload): Promise<AxiosResponse<EncryptPayload>> => {
-    return axios.post(`${this.config.baseUrl}/morfina/api/v1/encrypt`, payload);
+  encryptData<T>(payload: EncryptPayload<T>): Promise<AxiosResponse<EncryptPayload<T>>> {
+    return axios.post(`${this.config.baseUrl}/morfina/api/v1/encrypt`, payload, { headers: ApiClient.headers })
   }
 }
 
-export default ApiClient;
+export default class Client extends ApiClient {
+  constructor(config) {
+    super(config);
+  }
+}
