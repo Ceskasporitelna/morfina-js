@@ -53,7 +53,7 @@ describe("Corporate SDK", function () {
   var originalTimeoutInterval = null;
 
   beforeAll(function () {
-    judge = new CSCoreSDK.Judge('http://localhost:3001');
+    judge = new CSCoreSDK.Judge();
     //Because Judge starts slowly on the first request
     originalTimeoutInterval = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
