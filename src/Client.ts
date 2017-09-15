@@ -9,6 +9,7 @@ import {
   EncryptPayloadWithoutApiKeys,
   EncryptionParameterWithApiKey,
   EncryptionParameter,
+  EncryptionType,
 } from './model';
 import Computer from './Computer';
 import Decryptor from './Decryptor';
@@ -72,15 +73,8 @@ class MorfinaClient {
           .then(resp => {
             client = undefined;
             return new MorfinaClient(config, resp.data);
-          }).catch(err => {
-            console.log(err);
-            return null as any;
-          })
-      })
-      .catch(err => {
-        console.log(err);
-        return null as any;
-      })
+          });
+      });
   }
 
   /**¨
@@ -90,7 +84,7 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  morph = (payload: EncryptPayloadWithoutApiKeys): Promise<AxiosResponse<any>> => {
+  morph<T = any>(payload: EncryptPayloadWithoutApiKeys<T>): Promise<AxiosResponse<EncryptPayload<T>>> {
     const payloadWithApiKeys = {
       encryptionParameters: payload.encryptionParameters.map((x: EncryptionParameterWithApiKey) => {
         x.webAPIKey = this.config.webApiKey;
@@ -99,11 +93,7 @@ class MorfinaClient {
       dataArray: payload.dataArray,
     };
 
-    return this.apiClient.encryptData(payloadWithApiKeys).then(resp => {
-      // console.log(resp.data.paillier, this.credentials.PAILLIER);
-
-      return resp;
-    });
+    return this.apiClient.encryptData<T>(payloadWithApiKeys);
   }
 
   /**
@@ -148,20 +138,30 @@ class MorfinaClient {
    * 
    * @memberof MorfinaClient
    */
-  decryptData = (data: EncryptPayload): Promise<any> => {
+  decryptData<T = any>(data: EncryptPayload<T>): Promise<T> {
     return this.decryptor.decryptData(data);
   }
 
   /**
-   * Returns decrypted data by field key
-   * @param {object|string} data
-   * @param {EncryptionParameters} encryptionParameters
-   * @returns {Promise<object|string>}
+   * @param {string} value
+   * @param {EncryptionType} encryptionType
+   * @returns {Promise<string>}
    * 
-   * @memberof MorfinaClient
+   * @memberof Decryptor
    */
-  decryptField = (data: object | string, encryptionParameters: EncryptionParameter): Promise<object|string> => {
-    return this.decryptor.decryptField(data, encryptionParameters);
+  decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
+    return this.decryptor.decryptValue(value, encryptionType);
+  }
+
+  /**
+   * @param {*} data 
+   * @param {EncryptionParameter} encryptionParameters 
+   * @returns {Promise<string[]>} 
+   * 
+   * @memberof Decryptor
+   */
+  getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]> {
+    return this.decryptor.getDecryptedValuesForPath(data, encryptionParameters);
   }
 }
 

@@ -1,7 +1,7 @@
 import * as jp from 'jsonpath';
 import { AES, enc, mode, pad } from 'crypto-js';
 import { BigInteger } from 'jsbn';
-import { Credentials, EncryptPayload, EncryptionParameter } from './model';
+import { Credentials, EncryptPayload, EncryptionParameter, EncryptionType } from './model';
 
 /**
  * 
@@ -32,7 +32,7 @@ class Decryptor {
    * 
    * @memberof Decryptor
    */
-  decryptData = (data: EncryptPayload): Promise<any> => {
+  decryptData<T>(data: EncryptPayload<T>): Promise<T> {
     const dataArrayCopy = JSON.parse(JSON.stringify(data.dataArray));
 
     data.encryptionParameters.forEach(x => {
@@ -45,28 +45,34 @@ class Decryptor {
   }
 
   /**
-   * @param {object|string} data
-   * @param {EncryptionParameters} encryptionParameters
-   * @returns {Promise<object|string>}
+   * @param {string} value
+   * @param {EncryptionType} encryptionType
+   * @returns {Promise<string>}
    * 
    * @memberof Decryptor
    */
-  decryptField = (data: object | string, encryptionParameters: EncryptionParameter): Promise<object|string> => {
-    // return this.privateKey.decrypt(new BigInteger(data.toString())).toString(10);
+  decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
+    const decryptedValue = this.decryptVal(value, encryptionType);
+    return Promise.resolve(decryptedValue);
+  }
+
+  /**
+   * @param {*} data 
+   * @param {EncryptionParameter} encryptionParameters 
+   * @returns {Promise<string[]>} 
+   * 
+   * @memberof Decryptor
+   */
+  getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): Promise<string[]> {
     if(!encryptionParameters) {
       throw Error('You have to provide encryptionParameters as second argument');
     }
+    
+    const dataCopy = JSON.parse(JSON.stringify(data));
+    const decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
+                              .map(x => this.decryptVal(x, encryptionParameters.encryptionType));
 
-    if(typeof data === 'object' && encryptionParameters.jsonPath) {
-      const dataCopy = JSON.parse(JSON.stringify(data));
-      const decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
-                                .map(x => this.decryptVal(x, encryptionParameters.encryptionType));
-
-      return Promise.resolve(decryptedValues);
-    }
-
-    const decryptedValue = this.decryptVal(data, encryptionParameters.encryptionType);
-    return Promise.resolve(decryptedValue);
+    return Promise.resolve(decryptedValues);
   }
 
   /**
