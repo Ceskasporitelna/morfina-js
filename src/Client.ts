@@ -97,7 +97,7 @@ class MorfinaClient {
   }
 
   /**
-   * Precompute values to make future invokations of encrypt and randomize (significantly) faster.
+   * Precompute values to make future invokations of encrypt significantly faster.
    * @param {number} numberOfPrimes
    * @returns {Promise<any>}
    * 
