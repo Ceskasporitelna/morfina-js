@@ -38,7 +38,7 @@ async function getClient() {
   return client;
 }
 
-async function decrypt(judgeCase: string, encryptionType: EncryptionType) {
+async function encrypt(judgeCase: string, encryptionType: EncryptionType) {
   const client = await getClient();
   await judgeSession.setNextCase(judgeCase);
   
@@ -80,7 +80,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts data with AES through decryptData method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.aes', 'AES');
+      const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
       const result = await client.decryptData<Transactions>(response.data);
       expect(result.transactions[0].amount.value).toEqual('100');
 
@@ -92,7 +92,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts value with AES through decryptValue method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.aes', 'AES');
+      const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
       const result = await client.decryptValue(response.data.dataArray.transactions[0].amount.value as string, 'AES');
       
       expect(result).toEqual('100');
@@ -105,7 +105,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts value with AES through getDecryptedValuesForPath method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.aes', 'AES');
+      const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
       const result = await client.getDecryptedValuesForPath(response.data.dataArray, response.data.encryptionParameters[0]);
       
       expect(result[0]).toEqual('100');
@@ -118,7 +118,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts data with PAILLIER through decryptData method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.paillier', 'PAILLIER');
+      const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const result = await client.decryptData(response.data);
       expect(result.transactions[0].amount.value).toEqual('100');
 
@@ -130,7 +130,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts value with PAILLIER through decryptValue method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.paillier', 'PAILLIER');
+      const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const result = await client.decryptValue(response.data.dataArray.transactions[0].amount.value as string, 'PAILLIER');
       
       expect(result).toEqual('100');
@@ -143,7 +143,7 @@ describe("Corporate SDK", function () {
 
   it('decrypts value with PAILLIER through getDecryptedValuesForPath method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.paillier', 'PAILLIER');
+      const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const result = await client.getDecryptedValuesForPath(response.data.dataArray, response.data.encryptionParameters[0]);
       
       expect(result[0]).toEqual('100');
@@ -156,7 +156,7 @@ describe("Corporate SDK", function () {
 
   it('encrypts value then adds 10 to it and then decrypts it with PAILLIER through decryptValue method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.paillier', 'PAILLIER');
+      const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const added = client.add(response.data.dataArray.transactions[0].amount.value, 10);
       const result = await client.decryptValue(added, 'PAILLIER');
       
@@ -170,7 +170,7 @@ describe("Corporate SDK", function () {
 
   it('encrypts value then multiplies it by 2 and then decrypts it with PAILLIER through decryptValue method', async done => {
     try {
-      const { response, client } = await decrypt('morfina.encrypt.paillier', 'PAILLIER');
+      const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const multiplied = client.multiply(response.data.dataArray.transactions[0].amount.value, 2);
       const result = await client.decryptValue(multiplied, 'PAILLIER');
       
