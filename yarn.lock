@@ -19,7 +19,7 @@
     winston "^2.1.1"
     ws "^1.0.1"
 
-"@types/crypto-js@^3.1.35":
+"@types/crypto-js@^3.1.32", "@types/crypto-js@^3.1.35":
   version "3.1.35"
   resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-3.1.35.tgz#4c31439156c5986e2af0212000781388d9069a80"
 
@@ -809,9 +809,34 @@ crypto-browserify@3.3.0:
     ripemd160 "0.2.0"
     sha.js "2.2.6"
 
+crypto-js@^3.1.5:
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.8.tgz#715f070bf6014f2ae992a98b3929258b713f08d5"
+
 crypto-js@^3.1.9-1:
   version "3.1.9-1"
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.9-1.tgz#fda19e761fc077e01ffbfdc6e9fdfc59e8806cd8"
+
+cs-core-sdk@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/cs-core-sdk/-/cs-core-sdk-1.2.2.tgz#28d4fb91fbebce45926b8112b040cd79d1028707"
+  dependencies:
+    "@slack/client" "^3.12.0"
+    "@types/crypto-js" "^3.1.32"
+    "@types/es6-promise" "0.0.32"
+    "@types/jasmine" "^2.5.53"
+    "@types/lodash" "^4.14.46"
+    "@types/nock" "^8.2.0"
+    "@types/node" "^6.0.58"
+    "@types/node-uuid" "0.0.28"
+    "@types/underscore" "^1.7.36"
+    axios "^0.8.1"
+    crypto-js "^3.1.5"
+    date-fns "^1.10.0"
+    lodash "^4.16.6"
+    source-map-support "^0.3.3"
+    standard-error "^1.1.0"
+    uuid "^3.0.1"
 
 css-parse@1.0.4:
   version "1.0.4"

@@ -1,5 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 
+type EncryptionType = 'AES' | 'PAILLIER';
+
 interface Credentials {
   PAILLIER: {
     privateKey: {
@@ -35,7 +37,7 @@ interface AxiosResponse<T> {
 }
 
 interface EncryptionParameter {
-  encryptionType: string;
+  encryptionType: EncryptionType;
   jsonPath: string;
 }
 
@@ -43,17 +45,18 @@ interface EncryptionParameterWithApiKey extends EncryptionParameter {
   webAPIKey: string;
 }
 
-interface EncryptPayload {
+interface EncryptPayload<T> {
   encryptionParameters: EncryptionParameterWithApiKey[];
-  dataArray: any;
+  dataArray: T;
 }
 
-interface EncryptPayloadWithoutApiKeys {
+interface EncryptPayloadWithoutApiKeys<T> {
   encryptionParameters: EncryptionParameter[];
-  dataArray: any;
+  dataArray: T;
 }
 
 export {
+  EncryptionType,
   Credentials,
   Config,
   AxiosResponse,

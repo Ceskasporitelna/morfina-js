@@ -40,6 +40,9 @@ if (args.indexOf('--target-browser') != -1) {
 
 
 module.exports = {
+  node: {
+    fs: "empty"
+  },
   entry: './src/index.ts',
   output: {
     path: path.join(__dirname, 'build'),

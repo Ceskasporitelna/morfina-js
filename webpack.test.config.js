@@ -42,6 +42,9 @@ if (args.indexOf('--target-browser') != -1) {
 
 
 module.exports = {
+  node: {
+    fs: "empty"
+  },
   entry: './spec/tests.webpack.js',
   output: {
     path: path.join(__dirname, 'spec', 'build'),
