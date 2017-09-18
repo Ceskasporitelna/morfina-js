@@ -32,7 +32,7 @@ const getEncryptPayload = (encryptionType: EncryptionType): EncryptPayloadWithou
 async function getClient() {
   await judgeSession.setNextCase('morfina.getCryptoConfig');
   const client = await Morfina.getClient({
-    baseUrl: 'http://localhost:3001',
+    baseUrl: 'http://morfinaagents.westeurope.cloudapp.azure.com',
     webApiKey: 'TEST_API_KEY',
   });
   return client;
