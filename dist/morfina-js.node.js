@@ -47,13 +47,158 @@ module.exports =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var p = __webpack_require__(1);
-	exports.num = 3;
-	console.log('paillier', p);
+	var Client_1 = __webpack_require__(1);
+	exports.default = Client_1.default;
 
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var paillier = __webpack_require__(2);
+	var jsbn_1 = __webpack_require__(3);
+	var Computer_1 = __webpack_require__(5);
+	var Decryptor_1 = __webpack_require__(6);
+	var ApiClient_1 = __webpack_require__(9);
+	var utils_1 = __webpack_require__(11);
+	/**
+	 * MorfinaClient
+	 *
+	 * @class MorfinaClient
+	 */
+	var MorfinaClient = /** @class */ (function () {
+	    /**
+	     * Creates an instance of MorfinaClient.
+	     * @param {Config} config
+	     * @param {Credentials} credentials
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    function MorfinaClient(config, credentials) {
+	        var _this = this;
+	        /**
+	         * Precompute values to make future invokations of encrypt significantly faster.
+	         * @param {number} numberOfPrimes
+	         * @returns {Promise<any>}
+	         *
+	         * @memberof MorfinaClient
+	         */
+	        this.precompute = function (numberOfPrimes) {
+	            return _this.computer.precompute(numberOfPrimes);
+	        };
+	        /**
+	         * Returns sum of value1 and value2
+	         * @param {string|number} value1
+	         * @param {string|number} value2
+	         * @returns {string}
+	         *
+	         * @memberof MorfinaClient
+	         */
+	        this.add = function (value1, value2) {
+	            return _this.computer.add(value1, value2);
+	        };
+	        /**
+	         * Returns multiplication of value by num
+	         * @param {string} value
+	         * @param {number} num
+	         * @returns {string}
+	         *
+	         * @memberof MorfinaClient
+	         */
+	        this.multiply = function (value, num) {
+	            return _this.computer.multiply(value, num);
+	        };
+	        /**
+	         * @param {string} value
+	         * @param {EncryptionType} encryptionType
+	         * @returns {Promise<string>}
+	         *
+	         * @memberof Decryptor
+	         */
+	        this.decryptValue = function (value, encryptionType) {
+	            return _this.decryptor.decryptValue(value, encryptionType);
+	        };
+	        this.config = config;
+	        this.credentials = credentials;
+	        this.apiClient = new ApiClient_1.default(config);
+	        var pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.n));
+	        var priv = new paillier.privateKey(new jsbn_1.BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
+	        this.computer = new Computer_1.default(pub, priv);
+	        this.decryptor = new Decryptor_1.default(this.credentials, pub, priv);
+	    }
+	    /**¨
+	     * Calls Morfina server with payload where data are encrypted and sent back
+	     * @param {EncryptPayloadWithoutApiKeys} payload
+	     * @returns {Promise<AxiosResponse<any>>}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    MorfinaClient.prototype.morph = function (payload) {
+	        var _this = this;
+	        var payloadWithApiKeys = {
+	            encryptionParameters: payload.encryptionParameters.map(function (x) {
+	                x.webAPIKey = _this.config.webApiKey;
+	                return x;
+	            }),
+	            dataArray: payload.dataArray,
+	        };
+	        return this.apiClient.encryptData(payloadWithApiKeys);
+	    };
+	    /**
+	     * Returns decrypted data that is passed in encrypted
+	     * @param {EncryptPayload} data
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    MorfinaClient.prototype.decryptData = function (data) {
+	        return this.decryptor.decryptData(data);
+	    };
+	    /**
+	     * @param {*} data
+	     * @param {EncryptionParameter} encryptionParameters
+	     * @returns {Promise<string[]>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    MorfinaClient.prototype.getDecryptedValuesForPath = function (data, encryptionParameters) {
+	        return this.decryptor.getDecryptedValuesForPath(data, encryptionParameters);
+	    };
+	    /**
+	     * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
+	     * @param {Config} config
+	     * @returns {Promise<MorfinaClient>}
+	     *
+	     * @static
+	     * @memberof MorfinaClient
+	     */
+	    MorfinaClient.getClient = function (config) {
+	        var client = new ApiClient_1.default(config);
+	        if (!config) {
+	            throw Error('You have to pass credentials to MorfinaClient');
+	        }
+	        return client.getCryptoConfiguration()
+	            .then(function (resp) {
+	            if (!utils_1.isObjectEmpty(resp.data)) {
+	                client = undefined;
+	                return new MorfinaClient(config, resp.data);
+	            }
+	            return client.createCryptoConfiguration()
+	                .then(function (resp) {
+	                client = undefined;
+	                return new MorfinaClient(config, resp.data);
+	            });
+	        });
+	    };
+	    return MorfinaClient;
+	}());
+	exports.default = MorfinaClient;
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -68,9 +213,9 @@ module.exports =
 	// See the demo page on how to use it.
 	//
 	////////////////////////////////////////////////////////////////////////////////////
-	var BigInteger = __webpack_require__(2).BigInteger;
+	var BigInteger = __webpack_require__(3).BigInteger;
 	
-	var SecureRandom = __webpack_require__(3);
+	var SecureRandom = __webpack_require__(4);
 	
 	function lcm(a,b) {
 	  return a.multiply(b).divide(a.gcd(b));
@@ -161,13 +306,13 @@ module.exports =
 	module.exports = paillier;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 	module.exports = require("jsbn");
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 	// Random number generator - requires a PRNG backend, e.g. prng4.js
@@ -296,6 +441,290 @@ module.exports =
 	SecureRandom.prototype.nextBytes = rng_get_bytes;
 	
 	module.exports = SecureRandom;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var jsbn_1 = __webpack_require__(3);
+	/**
+	 *
+	 *
+	 * @class Computer
+	 */
+	var Computer = /** @class */ (function () {
+	    /**
+	     * Creates an instance of Computer.
+	     * @param {Credentials} credentials
+	     * @memberof Computer
+	     */
+	    function Computer(publicKey, privateKey) {
+	        var _this = this;
+	        /**
+	         * Precompute values to make future invokations of encrypt significantly faster.
+	         * @param {number} numberOfPrimes
+	         * @returns {Promise<any>}
+	         *
+	         * @memberof Computer
+	         */
+	        this.precompute = function (numberOfPrimes) {
+	            return Promise.resolve(_this.publicKey.precompute(numberOfPrimes));
+	        };
+	        /**
+	         * Returns sum of value1 and value2
+	         * @param {string|number} value1
+	         * @param {string|number} value2
+	         * @returns {string}
+	         *
+	         * @memberof Computer
+	         */
+	        this.add = function (value1, value2) {
+	            return _this.publicKey.add(_this.getEncryptedBigIntegerFromValue(value1), _this.getEncryptedBigIntegerFromValue(value2)).toString();
+	        };
+	        /**
+	         * Returns multiplication of value by num
+	         * @param {string|number} value
+	         * @param {number} num
+	         * @returns {string}
+	         *
+	         * @memberof Computer
+	         */
+	        this.multiply = function (value, num) {
+	            return _this.publicKey.mult(_this.getEncryptedBigIntegerFromValue(value), new jsbn_1.BigInteger(num.toString(), 10)).toString();
+	        };
+	        this.encrypt = function (x) { return _this.getEncryptedBigIntegerFromValue(x).toString(); };
+	        /**
+	         * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
+	         * If passed in values is number then in returns decrypted BigInteger.
+	         * @param {string | number} val
+	         * @returns {BigInteger}
+	         *
+	         * @private
+	         * @memberof Computer
+	         */
+	        this.getEncryptedBigIntegerFromValue = function (val) {
+	            if (typeof val === 'string') {
+	                return new jsbn_1.BigInteger(val, 10);
+	            }
+	            if (typeof val === 'number') {
+	                var bigInt = new jsbn_1.BigInteger(val.toString(), 10);
+	                return _this.publicKey.encrypt(bigInt);
+	            }
+	            throw Error('Input must be number or string');
+	        };
+	        this.publicKey = publicKey;
+	        this.privateKey = privateKey;
+	    }
+	    return Computer;
+	}());
+	exports.default = Computer;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var jp = __webpack_require__(7);
+	var crypto_js_1 = __webpack_require__(8);
+	var jsbn_1 = __webpack_require__(3);
+	/**
+	 *
+	 *
+	 * @class Decryptor
+	 */
+	var Decryptor = /** @class */ (function () {
+	    /**
+	     * Creates an instance of Decryptor.
+	     * @param {Credentials} credentials
+	     * @param {*} publicKey
+	     * @param {*} privateKey
+	     * @memberof Decryptor
+	     */
+	    function Decryptor(credentials, publicKey, privateKey) {
+	        var _this = this;
+	        /**
+	         * @param {string} value
+	         * @param {EncryptionType} encryptionType
+	         * @returns {Promise<string>}
+	         *
+	         * @memberof Decryptor
+	         */
+	        this.decryptValue = function (value, encryptionType) {
+	            var decryptedValue = _this.decryptVal(value, encryptionType);
+	            return Promise.resolve(decryptedValue);
+	        };
+	        /**
+	         * @param {any} val
+	         * @param {string} encryptionType
+	         * @returns {string}
+	         *
+	         * @private
+	         * @memberof Decryptor
+	         */
+	        this.decryptVal = function (val, encryptionType) {
+	            switch (encryptionType) {
+	                case 'AES':
+	                    return crypto_js_1.AES.decrypt(val, crypto_js_1.enc.Base64.parse(_this.credentials.AES.key), { mode: crypto_js_1.mode.ECB }).toString(crypto_js_1.enc.Utf8);
+	                case 'PAILLIER':
+	                    return _this.privateKey.decrypt(new jsbn_1.BigInteger(val.toString())).toString(10);
+	                default:
+	                    return val;
+	            }
+	        };
+	        /**
+	         * @param {string} path
+	         * @returns {string}
+	         *
+	         * @private
+	         * @memberof Decryptor
+	         */
+	        this.addAsteriskToArrayInPath = function (path) { return path.replace('[]', '[*]'); };
+	        this.credentials = credentials;
+	        this.publicKey = publicKey;
+	        this.privateKey = privateKey;
+	    }
+	    /**
+	     * @param {EncryptPayload} data
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    Decryptor.prototype.decryptData = function (data) {
+	        var _this = this;
+	        var dataArrayCopy = JSON.parse(JSON.stringify(data.dataArray));
+	        data.encryptionParameters.forEach(function (x) {
+	            jp.apply(dataArrayCopy, _this.addAsteriskToArrayInPath(x.jsonPath), function (val) {
+	                return _this.decryptVal(val, x.encryptionType);
+	            });
+	        });
+	        return Promise.resolve(dataArrayCopy);
+	    };
+	    /**
+	     * @param {*} data
+	     * @param {EncryptionParameter} encryptionParameters
+	     * @returns {Promise<string[]>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    Decryptor.prototype.getDecryptedValuesForPath = function (data, encryptionParameters) {
+	        var _this = this;
+	        if (!encryptionParameters) {
+	            throw Error('You have to provide encryptionParameters as second argument');
+	        }
+	        var dataCopy = JSON.parse(JSON.stringify(data));
+	        var decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
+	            .map(function (x) { return _this.decryptVal(x, encryptionParameters.encryptionType); });
+	        return Promise.resolve(decryptedValues);
+	    };
+	    return Decryptor;
+	}());
+	exports.default = Decryptor;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+	module.exports = require("jsonpath");
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+	module.exports = require("crypto-js");
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var axios = __webpack_require__(10);
+	/**
+	 *
+	 * @class ApiClient
+	 */
+	var ApiClient = /** @class */ (function () {
+	    /**
+	     * Creates an instance of ApiClient.
+	     * @param {any} config
+	     * @memberof ApiClient
+	     */
+	    function ApiClient(config) {
+	        var _this = this;
+	        /**
+	         * Create crypto configuration
+	         * @returns {Promise<AxiosResponse<Credentials>>}
+	         *
+	         * @memberof ApiClient
+	         */
+	        this.createCryptoConfiguration = function () {
+	            return axios.post(_this.config.baseUrl + "/morfina/api/v1/configuration/" + _this.config.webApiKey + "/create", null, { headers: ApiClient.headers });
+	        };
+	        /**
+	         * Get crypto configuration
+	         * @returns {Promise<AxiosResponse<Credentials>>}
+	         *
+	         * @memberof ApiClient
+	         */
+	        this.getCryptoConfiguration = function () {
+	            return axios.get(_this.config.baseUrl + "/morfina/api/v1/configuration/" + _this.config.webApiKey, { headers: ApiClient.headers });
+	        };
+	        this.config = config;
+	    }
+	    /**
+	     * Encrypt data
+	     * @param {EncryptPayload} payload
+	     * @returns {Promise<AxiosResponse<EncryptPayload>>}
+	     *
+	     * @memberof ApiClient
+	     */
+	    ApiClient.prototype.encryptData = function (payload) {
+	        return axios.post(this.config.baseUrl + "/morfina/api/v1/encrypt", payload, { headers: ApiClient.headers });
+	    };
+	    ApiClient.headers = {};
+	    return ApiClient;
+	}());
+	exports.ApiClient = ApiClient;
+	var Client = /** @class */ (function (_super) {
+	    __extends(Client, _super);
+	    function Client(config) {
+	        return _super.call(this, config) || this;
+	    }
+	    return Client;
+	}(ApiClient));
+	exports.default = Client;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+	module.exports = require("axios");
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var isObjectEmpty = function (obj) { return Object.keys(obj).length === 0 && obj.constructor === Object; };
+	exports.isObjectEmpty = isObjectEmpty;
+
 
 /***/ })
 /******/ ]);

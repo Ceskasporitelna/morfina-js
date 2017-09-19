@@ -1,6 +1,303 @@
 /// <reference types="es6-promise" />
+declare module 'morfina-js/model' {
+	import { AxiosRequestConfig } from 'axios'; type EncryptionType = 'AES' | 'PAILLIER';
+	interface Credentials {
+	    PAILLIER: {
+	        privateKey: {
+	            preCalculatedDenominator: string;
+	            lambda: string;
+	        };
+	        publicKey: {
+	            nSquared: string;
+	            g: string;
+	            bits: number;
+	            n: string;
+	        };
+	    };
+	    AES: {
+	        password: string;
+	        salt: string;
+	        keyLength: number;
+	        key: string;
+	    };
+	}
+	interface Config {
+	    baseUrl?: string;
+	    webApiKey: string;
+	}
+	interface AxiosResponse<T> {
+	    data: T;
+	    status: number;
+	    statusText: string;
+	    headers: any;
+	    config: AxiosRequestConfig;
+	}
+	interface EncryptionParameter {
+	    encryptionType: EncryptionType;
+	    jsonPath: string;
+	}
+	interface EncryptionParameterWithApiKey extends EncryptionParameter {
+	    webAPIKey: string;
+	}
+	interface EncryptPayload<T> {
+	    encryptionParameters: EncryptionParameterWithApiKey[];
+	    dataArray: T;
+	}
+	interface EncryptPayloadWithoutApiKeys<T> {
+	    encryptionParameters: EncryptionParameter[];
+	    dataArray: T;
+	}
+	export { EncryptionType, Credentials, Config, AxiosResponse, EncryptionParameter, EncryptionParameterWithApiKey, EncryptPayload, EncryptPayloadWithoutApiKeys };
+
+}
+declare module 'morfina-js/ApiClient' {
+	import { Credentials, AxiosResponse, EncryptPayload, Config } from 'morfina-js/model';
+	/**
+	 *
+	 * @class ApiClient
+	 */
+	export abstract class ApiClient {
+	    config: Config;
+	    static headers: object;
+	    /**
+	     * Creates an instance of ApiClient.
+	     * @param {any} config
+	     * @memberof ApiClient
+	     */
+	    constructor(config: any);
+	    /**
+	     * Create crypto configuration
+	     * @returns {Promise<AxiosResponse<Credentials>>}
+	     *
+	     * @memberof ApiClient
+	     */
+	    createCryptoConfiguration: () => Promise<AxiosResponse<Credentials>>;
+	    /**
+	     * Get crypto configuration
+	     * @returns {Promise<AxiosResponse<Credentials>>}
+	     *
+	     * @memberof ApiClient
+	     */
+	    getCryptoConfiguration: () => Promise<AxiosResponse<Credentials>>;
+	    /**
+	     * Encrypt data
+	     * @param {EncryptPayload} payload
+	     * @returns {Promise<AxiosResponse<EncryptPayload>>}
+	     *
+	     * @memberof ApiClient
+	     */
+	    encryptData<T>(payload: EncryptPayload<T>): Promise<AxiosResponse<EncryptPayload<T>>>;
+	}
+	export default class Client extends ApiClient {
+	    constructor(config: any);
+	}
+
+}
+declare module 'morfina-js/Computer' {
+	 class Computer {
+	    private publicKey;
+	    private privateKey;
+	    /**
+	     * Creates an instance of Computer.
+	     * @param {Credentials} credentials
+	     * @memberof Computer
+	     */
+	    constructor(publicKey: any, privateKey: any);
+	    /**
+	     * Precompute values to make future invokations of encrypt significantly faster.
+	     * @param {number} numberOfPrimes
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof Computer
+	     */
+	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    /**
+	     * Returns sum of value1 and value2
+	     * @param {string|number} value1
+	     * @param {string|number} value2
+	     * @returns {string}
+	     *
+	     * @memberof Computer
+	     */
+	    add: (value1: string | number, value2: string | number) => string;
+	    /**
+	     * Returns multiplication of value by num
+	     * @param {string|number} value
+	     * @param {number} num
+	     * @returns {string}
+	     *
+	     * @memberof Computer
+	     */
+	    multiply: (value: string | number, num: number) => string;
+	    encrypt: (x: any) => string;
+	    /**
+	     * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
+	     * If passed in values is number then in returns decrypted BigInteger.
+	     * @param {string | number} val
+	     * @returns {BigInteger}
+	     *
+	     * @private
+	     * @memberof Computer
+	     */
+	    private getEncryptedBigIntegerFromValue;
+	}
+	export default Computer;
+
+}
+declare module 'morfina-js/Decryptor' {
+	import { Credentials, EncryptPayload, EncryptionParameter, EncryptionType } from 'morfina-js/model'; class Decryptor {
+	    private credentials;
+	    private publicKey;
+	    private privateKey;
+	    /**
+	     * Creates an instance of Decryptor.
+	     * @param {Credentials} credentials
+	     * @param {*} publicKey
+	     * @param {*} privateKey
+	     * @memberof Decryptor
+	     */
+	    constructor(credentials: Credentials, publicKey: any, privateKey: any);
+	    /**
+	     * @param {EncryptPayload} data
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    decryptData<T>(data: EncryptPayload<T>): Promise<T>;
+	    /**
+	     * @param {string} value
+	     * @param {EncryptionType} encryptionType
+	     * @returns {Promise<string>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    decryptValue: (value: string, encryptionType: EncryptionType) => Promise<string>;
+	    /**
+	     * @param {*} data
+	     * @param {EncryptionParameter} encryptionParameters
+	     * @returns {Promise<string[]>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): Promise<string[]>;
+	    /**
+	     * @param {any} val
+	     * @param {string} encryptionType
+	     * @returns {string}
+	     *
+	     * @private
+	     * @memberof Decryptor
+	     */
+	    private decryptVal;
+	    /**
+	     * @param {string} path
+	     * @returns {string}
+	     *
+	     * @private
+	     * @memberof Decryptor
+	     */
+	    private addAsteriskToArrayInPath;
+	}
+	export default Decryptor;
+
+}
+declare module 'morfina-js/utils' {
+	 const isObjectEmpty: (obj: object) => boolean;
+	export { isObjectEmpty };
+
+}
+declare module 'morfina-js/Client' {
+	import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameter, EncryptionType } from 'morfina-js/model';
+	import Computer from 'morfina-js/Computer';
+	import Decryptor from 'morfina-js/Decryptor';
+	import ApiClient from 'morfina-js/ApiClient'; class MorfinaClient {
+	    config: Config;
+	    computer: Computer;
+	    decryptor: Decryptor;
+	    credentials: Credentials;
+	    apiClient: ApiClient;
+	    /**
+	     * Creates an instance of MorfinaClient.
+	     * @param {Config} config
+	     * @param {Credentials} credentials
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    constructor(config: Config, credentials: Credentials);
+	    /**
+	     * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
+	     * @param {Config} config
+	     * @returns {Promise<MorfinaClient>}
+	     *
+	     * @static
+	     * @memberof MorfinaClient
+	     */
+	    static getClient: (config: Config) => Promise<MorfinaClient>;
+	    /**¨
+	     * Calls Morfina server with payload where data are encrypted and sent back
+	     * @param {EncryptPayloadWithoutApiKeys} payload
+	     * @returns {Promise<AxiosResponse<any>>}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    morph<T = any>(payload: EncryptPayloadWithoutApiKeys<T>): Promise<AxiosResponse<EncryptPayload<T>>>;
+	    /**
+	     * Precompute values to make future invokations of encrypt significantly faster.
+	     * @param {number} numberOfPrimes
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    /**
+	     * Returns sum of value1 and value2
+	     * @param {string|number} value1
+	     * @param {string|number} value2
+	     * @returns {string}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    add: (value1: string | number, value2: string | number) => string;
+	    /**
+	     * Returns multiplication of value by num
+	     * @param {string} value
+	     * @param {number} num
+	     * @returns {string}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    multiply: (value: string | number, num: number) => string;
+	    /**
+	     * Returns decrypted data that is passed in encrypted
+	     * @param {EncryptPayload} data
+	     * @returns {Promise<any>}
+	     *
+	     * @memberof MorfinaClient
+	     */
+	    decryptData<T = any>(data: EncryptPayload<T>): Promise<T>;
+	    /**
+	     * @param {string} value
+	     * @param {EncryptionType} encryptionType
+	     * @returns {Promise<string>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    decryptValue: (value: string, encryptionType: EncryptionType) => Promise<string>;
+	    /**
+	     * @param {*} data
+	     * @param {EncryptionParameter} encryptionParameters
+	     * @returns {Promise<string[]>}
+	     *
+	     * @memberof Decryptor
+	     */
+	    getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]>;
+	}
+	export default MorfinaClient;
+
+}
 declare module 'morfina-js/index' {
-	export const num = 3;
+	import MorfinaClient from 'morfina-js/Client';
+	export default MorfinaClient;
 
 }
 declare module 'morfina-js'{ export * from 'morfina-js/morfina'}
