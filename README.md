@@ -23,7 +23,7 @@ For usage in browser, pickup the following files from the `/dist` folder:
 
 The MorfinaJS SDK will be available in global variable `Morfina`.
 
-**IMPORTANT!** CSAS SDKs depend on a native ES6 Promise implementation to be [supported](http://caniuse.com/promises).
+**IMPORTANT!** MorfinaJS SDK depends on a native ES6 Promise implementation to be [supported](http://caniuse.com/promises).
 If your environment doesn't support ES6 Promises, you can [polyfill](https://github.com/jakearchibald/es6-promise).
 
 ## Usage in node
@@ -38,7 +38,7 @@ var Morfina = require('morfina');
 ## Usage Guide
 **See [Usage Guide](./docs/README.md)** for usage instructions.
 
-#Development
+# Development
 The SDK itself is written in **TypeScript**, packaged by **webpack**, tested by **jasmine** & **karma** and distributed thorugh **npm**. It uses **tsd** for TypeScript definitions.
 
 In order to to develop upon this SDK, you will need the following **installed globally**:
@@ -71,7 +71,7 @@ This project uses the following directory structure:
 * `typings` - Typings used by the SDK
 * `tooling` - Commands for building and packaging 
 
-##Development commands
+## Development commands
 
 * `npm run clean` - cleans `build` and `dist` folders
 * `npm run build` - performs `clean` and builds the SDK into `build` folder. It also generates `.d.ts` files using `generate-tsd` command.
