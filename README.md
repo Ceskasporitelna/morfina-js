@@ -2,6 +2,39 @@
 
 MorfinaJS allows you to encrypt and decrypt data in Morfina Service. It also allows you to add to and multiply numbers encrypted with Paillier encryption type.
 
+```js
+
+  const payload = {
+    encryptionParameters: [
+      {
+        encryptionType: 'AES',
+        jsonPath: 'transactions[].amount.value',
+      }
+    ],
+    dataArray: {
+      transactions: [
+        {
+          amount: {
+            currency: 'CZK',
+            precision: 2,
+            value: 100
+          }
+        }
+      ]
+    }
+  }
+
+  Morfina.getClient({
+    baseUrl: 'path/to/morfina/service',
+    webApiKey: 'YOUR_API_KEY',
+  }).then(client => {
+    return client.morph(payload);
+  }).then(result => {
+    return client.decryptData(result);
+  }).then(...);
+
+```
+
 # [CHANGELOG](CHANGELOG.md)
 
 # Usage
@@ -36,39 +69,6 @@ var Morfina = require('morfina');
 ``` 
 
 ## Usage Guide
-
-```js
-
-  const payload = {
-    encryptionParameters: [
-      {
-        encryptionType: 'AES',
-        jsonPath: 'transactions[].amount.value',
-      }
-    ],
-    dataArray: {
-      transactions: [
-        {
-          amount: {
-            currency: 'CZK',
-            precision: 2,
-            value: 100
-          }
-        }
-      ]
-    }
-  }
-
-  Morfina.getClient({
-    baseUrl: 'path/to/morfina/service',
-    webApiKey: 'YOUR_API_KEY',
-  }).then(client => {
-    return client.morph(payload);
-  }).then(result => {
-    return client.decryptData(result);
-  }).then(...);
-
-```
 
 **See [Usage Guide](./docs/README.md)** for usage instructions.
 
