@@ -1,6 +1,5 @@
 import * as axios from 'axios';
 import * as paillier from '../lib/paillier';
-import * as dobrejPaillier from '../lib/paillierDobrej';
 import { BigInteger } from 'jsbn';
 import {
   Config,
@@ -41,7 +40,7 @@ class MorfinaClient {
     this.credentials = credentials;
     this.apiClient = new ApiClient(config);
 
-    const priv = new dobrejPaillier.PrivateKey(
+    const priv = new paillier.PrivateKey(
       new BigInteger(credentials.PAILLIER.publicKey.n),
       new BigInteger(credentials.PAILLIER.publicKey.g),
       new BigInteger(credentials.PAILLIER.privateKey.lambda),
@@ -49,7 +48,7 @@ class MorfinaClient {
       new BigInteger(credentials.PAILLIER.publicKey.nSquared)
     );
 
-    const pub = new dobrejPaillier.PublicKey(
+    const pub = new paillier.PublicKey(
       new BigInteger(credentials.PAILLIER.publicKey.n),
       new BigInteger(credentials.PAILLIER.publicKey.g),
       new BigInteger(credentials.PAILLIER.publicKey.nSquared)
