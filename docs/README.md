@@ -31,7 +31,7 @@ Encrypt data by calling the [`morph`](../src/Client.ts) method with [`payload: E
   const payload = {
     encryptionParameters: [
       {
-        encryptionType: encryptionType,
+        encryptionType: 'AES',
         jsonPath: 'transactions[].amount.value',
       }
     ],
