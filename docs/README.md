@@ -141,31 +141,34 @@ Get all decrypted values in `Array` for given encryptionParameters with the [`ge
 
 ```js
 
-  client.precompute(4);
+  client.precompute(4)
+    .then(...)
 
 ```
 
 ## Paillier Add
 
-[`add`](../src/Client.ts) returns encrypted sum of given numbers that can be either encrypted or not.
+[`add`](../src/Client.ts) returns encrypted sum of given numbers wrapped in Promise that can be either encrypted or not.
 
 ```js
 
   // paillier encrypted number
   const encryptedNum = '878967865867576578657657657865875786587531'
-  client.add(encryptedNum, 21);
+  client.add(encryptedNum, 21)
+    .then(...)
 
 
 ```
 
 ## Paillier Multiply
 
-[`multiply`](../src/Client.ts) multiplies either encrypted number in string or number as first argument by second argument that is of type number.
+[`multiply`](../src/Client.ts) multiplies either encrypted number in string or number as first argument by second argument that is of type number and returns the result wrapped in Promise.
 
 ```js
 
   // paillier encrypted number
   const encryptedNum = '878967865867576578657657657865875786587531'
-  client.multiply(encryptedNum, 3);
+  client.multiply(encryptedNum, 3)
+    .then(...)
 
 ```
