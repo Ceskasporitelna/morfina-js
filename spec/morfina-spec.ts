@@ -41,7 +41,7 @@ async function getClient() {
 async function encrypt(judgeCase: string, encryptionType: EncryptionType) {
   const client = await getClient();
   await judgeSession.setNextCase(judgeCase);
-  
+
   const response = await client.morph(getEncryptPayload(encryptionType));
   return {
     response,
@@ -49,7 +49,7 @@ async function encrypt(judgeCase: string, encryptionType: EncryptionType) {
   };
 }
 
-describe("Corporate SDK", function () {
+describe("Morfina SDK", function () {
   var originalTimeoutInterval = null;
 
   beforeAll(function () {
@@ -78,6 +78,39 @@ describe("Corporate SDK", function () {
     }
   });
 
+
+  it('Computer - Encryption/Decryption works with/without precomputed values', async done => {
+    //Without precomputation
+    let client = await getClient();
+    //This method of time computation is accurate enough for our purposes
+    var start = new Date().getTime();
+    let value = client.computer.encrypt(100);
+    value = client.computer.add(100, value);
+    let decrypted = await client.decryptor.decryptValue(value, "PAILLIER");
+    expect(decrypted).toEqual('200');
+    var end = new Date().getTime();
+    var withoutPrecomputationTime = end - start;
+
+    //With precomputation
+    client = await getClient();
+    await client.computer.precompute(2);
+    var start = new Date().getTime();
+    //WhiteBox testing
+    expect((client.computer as any).publicKey.rncache.length).toEqual(2);
+    value = client.computer.encrypt(100);
+    expect((client.computer as any).publicKey.rncache.length).toEqual(1);
+    value = client.computer.add(100, value);
+    decrypted = await client.decryptor.decryptValue(value, "PAILLIER");
+    expect(decrypted).toEqual('200');
+    expect((client.computer as any).publicKey.rncache.length).toEqual(0);
+    var end = new Date().getTime();
+    var withPrecomputationTime = end - start;
+    const threshold = 500;
+    expect(withoutPrecomputationTime).toBeGreaterThan(withPrecomputationTime + threshold)
+    done();
+  });
+
+
   it('decrypts data with AES through decryptData method', async done => {
     try {
       const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
@@ -94,7 +127,7 @@ describe("Corporate SDK", function () {
     try {
       const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
       const result = await client.decryptValue(response.data.dataArray.transactions[0].amount.value as string, 'AES');
-      
+
       expect(result).toEqual('100');
 
       done();
@@ -107,7 +140,7 @@ describe("Corporate SDK", function () {
     try {
       const { response, client } = await encrypt('morfina.encrypt.aes', 'AES');
       const result = await client.getDecryptedValuesForPath(response.data.dataArray, response.data.encryptionParameters[0]);
-      
+
       expect(result[0]).toEqual('100');
 
       done();
@@ -132,7 +165,7 @@ describe("Corporate SDK", function () {
     try {
       const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const result = await client.decryptValue(response.data.dataArray.transactions[0].amount.value as string, 'PAILLIER');
-      
+
       expect(result).toEqual('100');
 
       done();
@@ -141,11 +174,12 @@ describe("Corporate SDK", function () {
     }
   });
 
+
   it('decrypts value with PAILLIER through getDecryptedValuesForPath method', async done => {
     try {
       const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const result = await client.getDecryptedValuesForPath(response.data.dataArray, response.data.encryptionParameters[0]);
-      
+
       expect(result[0]).toEqual('100');
 
       done();
@@ -159,7 +193,7 @@ describe("Corporate SDK", function () {
       const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const added = client.add(response.data.dataArray.transactions[0].amount.value, 10);
       const result = await client.decryptValue(added, 'PAILLIER');
-      
+
       expect(result).toEqual('110');
 
       done();
@@ -173,7 +207,7 @@ describe("Corporate SDK", function () {
       const { response, client } = await encrypt('morfina.encrypt.paillier', 'PAILLIER');
       const multiplied = client.multiply(response.data.dataArray.transactions[0].amount.value, 2);
       const result = await client.decryptValue(multiplied, 'PAILLIER');
-      
+
       expect(result).toEqual('200');
 
       done();
