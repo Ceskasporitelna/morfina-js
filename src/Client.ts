@@ -151,7 +151,7 @@ class MorfinaClient {
    * @memberof MorfinaClient
    */
   decryptData<T = any>(data: EncryptPayload<T>): Promise<T> {
-    return this.decryptor.decryptData(data);
+    return Promise.resolve(this.decryptor.decryptData(data));
   }
 
   /**
@@ -162,7 +162,7 @@ class MorfinaClient {
    * @memberof Decryptor
    */
   decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
-    return this.decryptor.decryptValue(value, encryptionType);
+    return Promise.resolve(this.decryptor.decryptValue(value, encryptionType));
   }
 
   /**
@@ -173,7 +173,7 @@ class MorfinaClient {
    * @memberof Decryptor
    */
   getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]> {
-    return this.decryptor.getDecryptedValuesForPath(data, encryptionParameters);
+    return Promise.resolve(this.decryptor.getDecryptedValuesForPath(data, encryptionParameters));
   }
 }
 
