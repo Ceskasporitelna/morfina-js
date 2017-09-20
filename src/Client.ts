@@ -21,7 +21,7 @@ import { isObjectEmpty } from './utils';
  *
  * @class MorfinaClient
  */
-class MorfinaClient {
+export class MorfinaClient {
   config: Config;
   computer: Computer;
   decryptor: Decryptor;
@@ -176,5 +176,3 @@ class MorfinaClient {
     return Promise.resolve(this.decryptor.getDecryptedValuesForPath(data, encryptionParameters));
   }
 }
-
-export default MorfinaClient;
