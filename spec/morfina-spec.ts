@@ -1,4 +1,4 @@
-import Morfina from '../src';
+import { MorfinaClient } from '../src';
 import { EncryptPayloadWithoutApiKeys, EncryptionType } from '../src/model';
 import { ApiClient } from '../src/ApiClient';
 
@@ -31,7 +31,7 @@ const getEncryptPayload = (encryptionType: EncryptionType): EncryptPayloadWithou
 
 async function getClient() {
   await judgeSession.setNextCase('morfina.getCryptoConfig');
-  const client = await Morfina.getClient({
+  const client = await MorfinaClient.getClient({
     baseUrl: 'http://morfinaagents.westeurope.cloudapp.azure.com',
     webApiKey: 'TEST_API_KEY',
   });
