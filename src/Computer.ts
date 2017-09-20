@@ -1,10 +1,10 @@
-import * as paillier from '../lib/paillier';
+import * as paillier from '../lib/paillier'
 import { BigInteger } from 'jsbn';
 import { Credentials } from './model';
 
 /**
- * 
- * 
+ *
+ *
  * @class Computer
  */
 class Computer {
@@ -13,7 +13,7 @@ class Computer {
 
   /**
    * Creates an instance of Computer.
-   * @param {Credentials} credentials 
+   * @param {Credentials} credentials
    * @memberof Computer
    */
   constructor(publicKey, privateKey) {
@@ -25,7 +25,7 @@ class Computer {
    * Precompute values to make future invokations of encrypt significantly faster.
    * @param {number} numberOfPrimes
    * @returns {Promise<any>}
-   * 
+   *
    * @memberof Computer
    */
   precompute = (numberOfPrimes: number): Promise<any> => {
@@ -37,11 +37,11 @@ class Computer {
    * @param {string|number} value1
    * @param {string|number} value2
    * @returns {string}
-   * 
+   *
    * @memberof Computer
    */
   add = (value1: string | number, value2: string | number): string => {
-    return this.publicKey.add(
+    return this.publicKey.addCrypt(
       this.getEncryptedBigIntegerFromValue(value1),
       this.getEncryptedBigIntegerFromValue(value2)
     ).toString();
@@ -52,11 +52,11 @@ class Computer {
    * @param {string|number} value
    * @param {number} num
    * @returns {string}
-   * 
+   *
    * @memberof Computer
    */
   multiply = (value: string | number, num: number): string => {
-    return this.publicKey.mult(
+    return this.publicKey.multiply(
       this.getEncryptedBigIntegerFromValue(value),
       new BigInteger(num.toString(), 10)
     ).toString();
@@ -69,7 +69,7 @@ class Computer {
    * If passed in values is number then in returns decrypted BigInteger.
    * @param {string | number} val
    * @returns {BigInteger}
-   * 
+   *
    * @private
    * @memberof Computer
    */

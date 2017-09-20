@@ -18,7 +18,7 @@ import { isObjectEmpty } from './utils';
 
 /**
  * MorfinaClient
- * 
+ *
  * @class MorfinaClient
  */
 class MorfinaClient {
@@ -30,18 +30,30 @@ class MorfinaClient {
 
   /**
    * Creates an instance of MorfinaClient.
-   * @param {Config} config 
+   * @param {Config} config
    * @param {Credentials} credentials
-   * 
+   *
    * @memberof MorfinaClient
    */
   constructor(config: Config, credentials: Credentials) {
     this.config = config;
     this.credentials = credentials;
     this.apiClient = new ApiClient(config);
-    
-    const pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new BigInteger(credentials.PAILLIER.publicKey.n));
-    const priv = new paillier.privateKey(new BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
+
+    const priv = new paillier.PrivateKey(
+      new BigInteger(credentials.PAILLIER.publicKey.n),
+      new BigInteger(credentials.PAILLIER.publicKey.g),
+      new BigInteger(credentials.PAILLIER.privateKey.lambda),
+      new BigInteger(credentials.PAILLIER.privateKey.preCalculatedDenominator),
+      new BigInteger(credentials.PAILLIER.publicKey.nSquared)
+    );
+
+    const pub = new paillier.PublicKey(
+      new BigInteger(credentials.PAILLIER.publicKey.n),
+      new BigInteger(credentials.PAILLIER.publicKey.g),
+      new BigInteger(credentials.PAILLIER.publicKey.nSquared)
+    );
+
 
     this.computer = new Computer(pub, priv);
     this.decryptor = new Decryptor(this.credentials, pub, priv);
@@ -51,7 +63,7 @@ class MorfinaClient {
    * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
    * @param {Config} config
    * @returns {Promise<MorfinaClient>}
-   * 
+   *
    * @static
    * @memberof MorfinaClient
    */
@@ -81,7 +93,7 @@ class MorfinaClient {
    * Calls Morfina server with payload where data are encrypted and sent back
    * @param {EncryptPayloadWithoutApiKeys} payload
    * @returns {Promise<AxiosResponse<any>>}
-   * 
+   *
    * @memberof MorfinaClient
    */
   morph<T = any>(payload: EncryptPayloadWithoutApiKeys<T>): Promise<AxiosResponse<EncryptPayload<T>>> {
@@ -100,7 +112,7 @@ class MorfinaClient {
    * Precompute values to make future invokations of encrypt significantly faster.
    * @param {number} numberOfPrimes
    * @returns {Promise<any>}
-   * 
+   *
    * @memberof MorfinaClient
    */
   precompute = (numberOfPrimes: number): Promise<any> => {
@@ -112,7 +124,7 @@ class MorfinaClient {
    * @param {string|number} value1
    * @param {string|number} value2
    * @returns {string}
-   * 
+   *
    * @memberof MorfinaClient
    */
   add = (value1: string | number, value2: string | number): string => {
@@ -124,7 +136,7 @@ class MorfinaClient {
    * @param {string} value
    * @param {number} num
    * @returns {string}
-   * 
+   *
    * @memberof MorfinaClient
    */
   multiply = (value: string | number, num: number): string => {
@@ -135,7 +147,7 @@ class MorfinaClient {
    * Returns decrypted data that is passed in encrypted
    * @param {EncryptPayload} data
    * @returns {Promise<any>}
-   * 
+   *
    * @memberof MorfinaClient
    */
   decryptData<T = any>(data: EncryptPayload<T>): Promise<T> {
@@ -146,7 +158,7 @@ class MorfinaClient {
    * @param {string} value
    * @param {EncryptionType} encryptionType
    * @returns {Promise<string>}
-   * 
+   *
    * @memberof Decryptor
    */
   decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
@@ -154,10 +166,10 @@ class MorfinaClient {
   }
 
   /**
-   * @param {*} data 
-   * @param {EncryptionParameter} encryptionParameters 
-   * @returns {Promise<string[]>} 
-   * 
+   * @param {*} data
+   * @param {EncryptionParameter} encryptionParameters
+   * @returns {Promise<string[]>}
+   *
    * @memberof Decryptor
    */
   getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]> {
