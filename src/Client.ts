@@ -111,36 +111,36 @@ export class MorfinaClient {
   /**
    * Precompute values to make future invokations of encrypt significantly faster.
    * @param {number} numberOfPrimes
-   * @returns {Promise<any>}
+   * @returns {Promise<void>}
    *
    * @memberof MorfinaClient
    */
-  precompute = (numberOfPrimes: number): Promise<any> => {
-    return this.computer.precompute(numberOfPrimes);
+  precompute = (numberOfPrimes: number): Promise<void> => {
+    return Promise.resolve(this.computer.precompute(numberOfPrimes));
   }
 
   /**
    * Returns sum of value1 and value2
    * @param {string|number} value1
    * @param {string|number} value2
-   * @returns {string}
+   * @returns {Promise<string>}
    *
    * @memberof MorfinaClient
    */
-  add = (value1: string | number, value2: string | number): string => {
-    return this.computer.add(value1, value2);
+  add = (value1: string | number, value2: string | number): Promise<string> => {
+    return Promise.resolve(this.computer.add(value1, value2));
   }
 
   /**
    * Returns multiplication of value by num
    * @param {string} value
    * @param {number} num
-   * @returns {string}
+   * @returns {Promise<string>}
    *
    * @memberof MorfinaClient
    */
-  multiply = (value: string | number, num: number): string => {
-    return this.computer.multiply(value, num);
+  multiply = (value: string | number, num: number): Promise<string> => {
+    return Promise.resolve(this.computer.multiply(value, num));
   }
 
   /**
@@ -151,7 +151,7 @@ export class MorfinaClient {
    * @memberof MorfinaClient
    */
   decryptData<T = any>(data: EncryptPayload<T>): Promise<T> {
-    return this.decryptor.decryptData(data);
+    return Promise.resolve(this.decryptor.decryptData(data));
   }
 
   /**
@@ -162,7 +162,7 @@ export class MorfinaClient {
    * @memberof Decryptor
    */
   decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
-    return this.decryptor.decryptValue(value, encryptionType);
+    return Promise.resolve(this.decryptor.decryptValue(value, encryptionType));
   }
 
   /**
@@ -173,6 +173,6 @@ export class MorfinaClient {
    * @memberof Decryptor
    */
   getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]> {
-    return this.decryptor.getDecryptedValuesForPath(data, encryptionParameters);
+    return Promise.resolve(this.decryptor.getDecryptedValuesForPath(data, encryptionParameters));
   }
 }

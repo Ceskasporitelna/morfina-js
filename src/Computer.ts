@@ -24,12 +24,12 @@ class Computer {
   /**
    * Precompute values to make future invokations of encrypt significantly faster.
    * @param {number} numberOfPrimes
-   * @returns {Promise<any>}
+   * @returns {void}
    *
    * @memberof Computer
    */
-  precompute = (numberOfPrimes: number): Promise<any> => {
-    return Promise.resolve(this.publicKey.precompute(numberOfPrimes));
+  precompute = (numberOfPrimes: number): void => {
+    return this.publicKey.precompute(numberOfPrimes);
   }
 
   /**
@@ -61,8 +61,6 @@ class Computer {
       new BigInteger(num.toString(), 10)
     ).toString();
   }
-
-  encrypt = (x) => this.getEncryptedBigIntegerFromValue(x).toString();
 
   /**
    * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.

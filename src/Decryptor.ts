@@ -28,11 +28,11 @@ class Decryptor {
 
   /**
    * @param {EncryptPayload} data
-   * @returns {Promise<any>}
+   * @returns {T}
    * 
    * @memberof Decryptor
    */
-  decryptData<T>(data: EncryptPayload<T>): Promise<T> {
+  decryptData<T>(data: EncryptPayload<T>): T {
     const dataArrayCopy = JSON.parse(JSON.stringify(data.dataArray));
 
     data.encryptionParameters.forEach(x => {
@@ -41,29 +41,29 @@ class Decryptor {
       });
     });
 
-    return Promise.resolve(dataArrayCopy);
+    return dataArrayCopy;
   }
 
   /**
    * @param {string} value
    * @param {EncryptionType} encryptionType
-   * @returns {Promise<string>}
+   * @returns {string}
    * 
    * @memberof Decryptor
    */
-  decryptValue = (value: string, encryptionType: EncryptionType): Promise<string> => {
+  decryptValue = (value: string, encryptionType: EncryptionType): string => {
     const decryptedValue = this.decryptVal(value, encryptionType);
-    return Promise.resolve(decryptedValue);
+    return decryptedValue;
   }
 
   /**
    * @param {*} data 
    * @param {EncryptionParameter} encryptionParameters 
-   * @returns {Promise<string[]>} 
+   * @returns {string[]} 
    * 
    * @memberof Decryptor
    */
-  getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): Promise<string[]> {
+  getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): string[] {
     if(!encryptionParameters) {
       throw Error('You have to provide encryptionParameters as second argument');
     }
@@ -72,7 +72,7 @@ class Decryptor {
     const decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
                               .map(x => this.decryptVal(x, encryptionParameters.encryptionType));
 
-    return Promise.resolve(decryptedValues);
+    return decryptedValues;
   }
 
   /**
