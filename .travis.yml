@@ -24,6 +24,13 @@ script:
   - "npm test"
 after_success:
   - sh ./tooling/sign.sh
+deploy:
+  provider: npm
+  email: developers@csas.cz
+  api_key: $NPM_TOKEN
+  on:
+    tags: true
+    branch: master
 addons:
   packages:
     - unzip
