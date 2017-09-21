@@ -111,7 +111,7 @@ describe("Morfina SDK", function () {
     const result2 = await sumPaillier(client);
     expect((client.computer as any).publicKey.rncache.length).toEqual(0);
 
-    const threshold = 200;
+    const threshold = 100;
     expect(result1.time).toBeGreaterThan(result2.time + threshold);
 
     done();
