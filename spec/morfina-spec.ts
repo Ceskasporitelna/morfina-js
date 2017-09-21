@@ -50,7 +50,7 @@ async function encrypt(judgeCase: string, encryptionType: EncryptionType) {
 }
 
 async function sumPaillier(client) {
-  
+
   const response = await client.morph(getEncryptPayload('PAILLIER'));
   const encryptedVal = response.data.dataArray.transactions[0].amount.value;
 
@@ -111,7 +111,7 @@ describe("Morfina SDK", function () {
     const result2 = await sumPaillier(client);
     expect((client.computer as any).publicKey.rncache.length).toEqual(0);
 
-    const threshold = 500;
+    const threshold = 200;
     expect(result1.time).toBeGreaterThan(result2.time + threshold);
 
     done();
