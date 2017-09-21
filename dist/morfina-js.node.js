@@ -46,9 +46,11 @@ module.exports =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Client_1 = __webpack_require__(1);
-	exports.default = Client_1.default;
+	__export(__webpack_require__(1));
 
 
 /***/ }),
@@ -81,34 +83,34 @@ module.exports =
 	        /**
 	         * Precompute values to make future invokations of encrypt significantly faster.
 	         * @param {number} numberOfPrimes
-	         * @returns {Promise<any>}
+	         * @returns {Promise<void>}
 	         *
 	         * @memberof MorfinaClient
 	         */
 	        this.precompute = function (numberOfPrimes) {
-	            return _this.computer.precompute(numberOfPrimes);
+	            return Promise.resolve(_this.computer.precompute(numberOfPrimes));
 	        };
 	        /**
 	         * Returns sum of value1 and value2
 	         * @param {string|number} value1
 	         * @param {string|number} value2
-	         * @returns {string}
+	         * @returns {Promise<string>}
 	         *
 	         * @memberof MorfinaClient
 	         */
 	        this.add = function (value1, value2) {
-	            return _this.computer.add(value1, value2);
+	            return Promise.resolve(_this.computer.add(value1, value2));
 	        };
 	        /**
 	         * Returns multiplication of value by num
 	         * @param {string} value
 	         * @param {number} num
-	         * @returns {string}
+	         * @returns {Promise<string>}
 	         *
 	         * @memberof MorfinaClient
 	         */
 	        this.multiply = function (value, num) {
-	            return _this.computer.multiply(value, num);
+	            return Promise.resolve(_this.computer.multiply(value, num));
 	        };
 	        /**
 	         * @param {string} value
@@ -118,13 +120,13 @@ module.exports =
 	         * @memberof Decryptor
 	         */
 	        this.decryptValue = function (value, encryptionType) {
-	            return _this.decryptor.decryptValue(value, encryptionType);
+	            return Promise.resolve(_this.decryptor.decryptValue(value, encryptionType));
 	        };
 	        this.config = config;
 	        this.credentials = credentials;
 	        this.apiClient = new ApiClient_1.default(config);
-	        var pub = new paillier.publicKey(credentials.PAILLIER.publicKey.bits, new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.n));
-	        var priv = new paillier.privateKey(new jsbn_1.BigInteger(credentials.PAILLIER.privateKey.lambda), pub);
+	        var priv = new paillier.PrivateKey(new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.n), new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.g), new jsbn_1.BigInteger(credentials.PAILLIER.privateKey.lambda), new jsbn_1.BigInteger(credentials.PAILLIER.privateKey.preCalculatedDenominator), new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.nSquared));
+	        var pub = new paillier.PublicKey(new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.n), new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.g), new jsbn_1.BigInteger(credentials.PAILLIER.publicKey.nSquared));
 	        this.computer = new Computer_1.default(pub, priv);
 	        this.decryptor = new Decryptor_1.default(this.credentials, pub, priv);
 	    }
@@ -154,7 +156,7 @@ module.exports =
 	     * @memberof MorfinaClient
 	     */
 	    MorfinaClient.prototype.decryptData = function (data) {
-	        return this.decryptor.decryptData(data);
+	        return Promise.resolve(this.decryptor.decryptData(data));
 	    };
 	    /**
 	     * @param {*} data
@@ -164,7 +166,7 @@ module.exports =
 	     * @memberof Decryptor
 	     */
 	    MorfinaClient.prototype.getDecryptedValuesForPath = function (data, encryptionParameters) {
-	        return this.decryptor.getDecryptedValuesForPath(data, encryptionParameters);
+	        return Promise.resolve(this.decryptor.getDecryptedValuesForPath(data, encryptionParameters));
 	    };
 	    /**
 	     * Calls Morfina API for crypto and returns "instance" of MorfinaClient with crypto
@@ -194,116 +196,155 @@ module.exports =
 	    };
 	    return MorfinaClient;
 	}());
-	exports.default = MorfinaClient;
+	exports.MorfinaClient = MorfinaClient;
 
 
 /***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	////////////////////////////////////////////////////////////////////////////////////
-	//
-	// paillier.js: a simple proof-of-concept Javascript implementation of the
-	// Paillier homomorphic encryption system.
-	//
-	// Author: Maarten H. Everts (TNO)
-	//
-	// Dependencies: jsbn, from http://www-cs-students.stanford.edu/~tjw/jsbn/
-	//  (you will need at least jsbn.js, jsbn2.js, prng4.js, and rng.js)
-	// See the demo page on how to use it.
-	//
-	////////////////////////////////////////////////////////////////////////////////////
-	var BigInteger = __webpack_require__(3).BigInteger;
+	/**
+	 * Implement the Paillier cryptosystem in JavaScript.
+	 */
 	
-	var SecureRandom = __webpack_require__(4);
+	    var BigInteger = __webpack_require__(3).BigInteger;
 	
-	function lcm(a,b) {
-	  return a.multiply(b).divide(a.gcd(b));
-	}
+	    var SecureRandom = __webpack_require__(4);
 	
-	paillier = {
-		publicKey: function(bits, n) {
-			// bits
-			this.bits = bits;
-			// n
-			this.n = n;
-			// n2 (cached n^2)
-			this.n2 = n.square();
-			// np1 (cached n+1)
-			this.np1 = n.add(BigInteger.ONE);
-			this.rncache = new Array();
-		},
-		privateKey: function(lambda, pubkey) {
-			// lambda
-			this.lambda = lambda;
-			this.pubkey = pubkey;
-			// x (cached) for decryption
-			this.x = pubkey.np1.modPow(this.lambda,pubkey.n2).subtract(BigInteger.ONE).divide(pubkey.n).modInverse(pubkey.n);
-		},
-		generateKeys: function(modulusbits) {
-			var p, q, n, keys = {}, rng = new SecureRandom();
-			do {
-				do {
-					p = new BigInteger(modulusbits>>1,1,rng);
-				} while (!p.isProbablePrime(10));
+	    var rng = new SecureRandom();
+	    var TWO = BigInteger.valueOf(2);
 	
-				do {
-					q = new BigInteger(modulusbits>>1,1,rng);
-				} while(!q.isProbablePrime(10));
+	    var Paillier = {
+	        generate: function (bitLength) {
+	            var p, q;
+	            do {
+	                p = new BigInteger(bitLength, 1, rng);
+	                q = new BigInteger(bitLength, 1, rng);
+	            } while (p.equals(q));
 	
-				n = p.multiply(q);
-			} while(!(n.testBit(modulusbits - 1)) || (p.compareTo(q) == 0));
-			keys.pub = new paillier.publicKey(modulusbits,n);
-			lambda = lcm(p.subtract(BigInteger.ONE),q.subtract(BigInteger.ONE));
-			keys.sec = new paillier.privateKey(lambda, keys.pub);
-			return keys;
-		}
-	}
+	            var n = p.multiply(q);
 	
+	            // p - 1
+	            var p1 = p.subtract(BigInteger.ONE);
+	            // q - 1
+	            var q1 = q.subtract(BigInteger.ONE);
 	
-	paillier.publicKey.prototype = {
-		encrypt: function(m) {
-			return this.randomize(this.n.multiply(m).add(BigInteger.ONE).mod(this.n2));
-		},
-		add: function(a,b) {
-			return a.multiply(b).remainder(this.n2);
-		},
-		mult: function(a,b) {
-			return a.modPow(b, this.n2);
-		},
-		randomize: function(a) {
-			var rn;
-			if (this.rncache.length > 0) {
-				rn = this.rncache.pop();
-			} else {
-				rn = this.getRN();
+	            var nSq = n.multiply(n);
+	
+	            // lambda
+	            var l = p1.multiply(q1).divide(p1.gcd(q1));
+	
+	            var coprimeBitLength = n.bitLength() - Math.floor(Math.random() * 10);
+	
+	            var alpha = new BigInteger(coprimeBitLength, 1, rng);
+	            var beta = new BigInteger(coprimeBitLength, 1, rng);
+	
+	            var g = alpha.multiply(n).add(BigInteger.ONE)
+	                .multiply(beta.modPow(n, nSq)).mod(nSq);
+	
+	            // mu
+	            var m = g.modPow(l, nSq).mod(nSq)
+	                .subtract(BigInteger.ONE).divide(n).modInverse(n);
+	
+	            return new Paillier.PrivateKey(n, g, l, m, nSq);
+	        }
+	    };
+	
+	    Paillier.PublicKey = function (n, g, nSq) {
+	        this.n = n;
+	        this.g = g;
+	        this.nSq = nSq || n.multiply(n);
+	        this.rncache = [];
+	    };
+	
+	    Paillier.PublicKey.prototype.encrypt = function (i, r) {
+	        if (!r) {
+	            var rn;
+	            if (this.rncache.length > 0) {
+	                rn = this.rncache.pop();
+	            } else {
+	                rn = this.getRandomNumber();
+	            }
+	            r = rn;
+	        }
+	        return this.g.modPow(i, this.nSq).multiply(r.modPow(this.n, this.nSq))
+	            .mod(this.nSq);
+	    };
+	
+	    Paillier.PublicKey.prototype.add = function (c, f) {
+	        return c.multiply(this.encrypt(f)).mod(this.nSq);
+	    };
+	
+	    Paillier.PublicKey.prototype.addCrypt = function (c, f) {
+	        return c.multiply(f).mod(this.nSq);
+	    };
+	
+	    Paillier.PublicKey.prototype.multiply = function (c, f) {
+	        return c.modPow(f, this.nSq);
+	    };
+	
+	    Paillier.PublicKey.prototype.precompute = function(n) {
+	        for (var i = 0; i < n; i++) {
+				this.rncache.push(this.getRandomNumber());
 			}
-			return (a.multiply(rn)).mod(this.n2);
-		},
-		getRN: function() {
-			var r, rng = new SecureRandom();
-			do {
-				r = new BigInteger(this.bits,rng);
-				// make sure r <= n
-			} while(r.compareTo(this.n) >= 0);
-			return r.modPow(this.n, this.n2);
-		},
-		// Precompute values to make future invokations of encrypt and randomize (significantly) faster.
-		// n is the number of precomputed values.
-		precompute: function(n) {
-			for (var i = 0; i < n; i++) {
-				this.rncache.push(this.getRN());
-			}
-		}
-	}
+	    }
 	
-	paillier.privateKey.prototype = {
-		decrypt: function(c) {
-			return c.modPow(this.lambda,this.pubkey.n2).subtract(BigInteger.ONE).divide(this.pubkey.n).multiply(this.x).mod(this.pubkey.n);
-		}
-	}
+	    Paillier.PublicKey.prototype.getRandomNumber = function() {
+	        var coprimeBitLength = this.n.bitLength() - Math.floor(Math.random() * 10);
+	        return new BigInteger(coprimeBitLength, 1, rng);
+	    };
 	
-	module.exports = paillier;
+	    Paillier.PublicKey.prototype.rerandomize = function (c, r) {
+	        if (!r) {
+	            var rn;
+	            if (this.rncache.length > 0) {
+	                rn = this.rncache.pop();
+	            } else {
+	                rn = this.getRandomNumber();
+	            }
+	            r = rn;
+	        }
+	        return c.multiply(r.modPow(this.n, this.nSq)).mod(this.nSq);
+	    };
+	
+	    Paillier.PrivateKey = function (n, g, l, m, nSq) {
+	        this.l = l;
+	        this.m = m;
+	        this.n = n;
+	        this.nSq = nSq || n.multiply(n);
+	        this.pub = new Paillier.PublicKey(n, g, this.nSq);
+	    };
+	
+	    Paillier.PrivateKey.prototype.decrypt = function (c) {
+	        return c.modPow(this.l, this.nSq).subtract(BigInteger.ONE)
+	            .divide(this.n).multiply(this.m).mod(this.n);
+	    };
+	
+	    Paillier.PrivateKey.prototype.decryptR = function (c, i) {
+	        if (!i) {
+	            i = this.decrypt(c);
+	        }
+	        var rn = c.multiply(this.pub.g.modPow(i, this.nSq).modInverse(this.nSq))
+	            .mod(this.nSq);
+	        var a = this.l.modInverse(this.n).multiply(this.n.subtract(BigInteger.ONE));
+	        var e = a.multiply(this.l).add(BigInteger.ONE).divide(this.n);
+	        return rn.modPow(e, this.n);
+	    };
+	
+	    function createProxyMethod(name) {
+	        return function () {
+	            return this.pub[name].apply(this.pub,
+	                Array.prototype.slice.apply(arguments));
+	        };
+	    }
+	
+	    var a = ["add", "addCrypt", "multiply", "rerandomize", "encrypt"];
+	    for (var i = 0, l = a.length; i < l; i++) {
+	        Paillier.PrivateKey.prototype[a[i]] = createProxyMethod(a[i]);
+	    }
+	
+	    module.exports = Paillier;
+
 
 /***/ }),
 /* 3 */
@@ -465,12 +506,12 @@ module.exports =
 	        /**
 	         * Precompute values to make future invokations of encrypt significantly faster.
 	         * @param {number} numberOfPrimes
-	         * @returns {Promise<any>}
+	         * @returns {void}
 	         *
 	         * @memberof Computer
 	         */
 	        this.precompute = function (numberOfPrimes) {
-	            return Promise.resolve(_this.publicKey.precompute(numberOfPrimes));
+	            return _this.publicKey.precompute(numberOfPrimes);
 	        };
 	        /**
 	         * Returns sum of value1 and value2
@@ -481,7 +522,7 @@ module.exports =
 	         * @memberof Computer
 	         */
 	        this.add = function (value1, value2) {
-	            return _this.publicKey.add(_this.getEncryptedBigIntegerFromValue(value1), _this.getEncryptedBigIntegerFromValue(value2)).toString();
+	            return _this.publicKey.addCrypt(_this.getEncryptedBigIntegerFromValue(value1), _this.getEncryptedBigIntegerFromValue(value2)).toString();
 	        };
 	        /**
 	         * Returns multiplication of value by num
@@ -492,9 +533,8 @@ module.exports =
 	         * @memberof Computer
 	         */
 	        this.multiply = function (value, num) {
-	            return _this.publicKey.mult(_this.getEncryptedBigIntegerFromValue(value), new jsbn_1.BigInteger(num.toString(), 10)).toString();
+	            return _this.publicKey.multiply(_this.getEncryptedBigIntegerFromValue(value), new jsbn_1.BigInteger(num.toString(), 10)).toString();
 	        };
-	        this.encrypt = function (x) { return _this.getEncryptedBigIntegerFromValue(x).toString(); };
 	        /**
 	         * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
 	         * If passed in values is number then in returns decrypted BigInteger.
@@ -549,13 +589,13 @@ module.exports =
 	        /**
 	         * @param {string} value
 	         * @param {EncryptionType} encryptionType
-	         * @returns {Promise<string>}
+	         * @returns {string}
 	         *
 	         * @memberof Decryptor
 	         */
 	        this.decryptValue = function (value, encryptionType) {
 	            var decryptedValue = _this.decryptVal(value, encryptionType);
-	            return Promise.resolve(decryptedValue);
+	            return decryptedValue;
 	        };
 	        /**
 	         * @param {any} val
@@ -589,7 +629,7 @@ module.exports =
 	    }
 	    /**
 	     * @param {EncryptPayload} data
-	     * @returns {Promise<any>}
+	     * @returns {T}
 	     *
 	     * @memberof Decryptor
 	     */
@@ -601,12 +641,12 @@ module.exports =
 	                return _this.decryptVal(val, x.encryptionType);
 	            });
 	        });
-	        return Promise.resolve(dataArrayCopy);
+	        return dataArrayCopy;
 	    };
 	    /**
 	     * @param {*} data
 	     * @param {EncryptionParameter} encryptionParameters
-	     * @returns {Promise<string[]>}
+	     * @returns {string[]}
 	     *
 	     * @memberof Decryptor
 	     */
@@ -618,7 +658,7 @@ module.exports =
 	        var dataCopy = JSON.parse(JSON.stringify(data));
 	        var decryptedValues = jp.query(dataCopy, this.addAsteriskToArrayInPath(encryptionParameters.jsonPath))
 	            .map(function (x) { return _this.decryptVal(x, encryptionParameters.encryptionType); });
-	        return Promise.resolve(decryptedValues);
+	        return decryptedValues;
 	    };
 	    return Decryptor;
 	}());

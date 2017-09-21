@@ -106,11 +106,11 @@ declare module Morfina {
 	    /**
 	     * Precompute values to make future invokations of encrypt significantly faster.
 	     * @param {number} numberOfPrimes
-	     * @returns {Promise<any>}
+	     * @returns {void}
 	     *
 	     * @memberof Computer
 	     */
-	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    precompute: (numberOfPrimes: number) => void;
 	    /**
 	     * Returns sum of value1 and value2
 	     * @param {string|number} value1
@@ -129,7 +129,6 @@ declare module Morfina {
 	     * @memberof Computer
 	     */
 	    multiply: (value: string | number, num: number) => string;
-	    encrypt: (x: any) => string;
 	    /**
 	     * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
 	     * If passed in values is number then in returns decrypted BigInteger.
@@ -159,27 +158,27 @@ declare module Morfina {
 	    constructor(credentials: Credentials, publicKey: any, privateKey: any);
 	    /**
 	     * @param {EncryptPayload} data
-	     * @returns {Promise<any>}
+	     * @returns {T}
 	     *
 	     * @memberof Decryptor
 	     */
-	    decryptData<T>(data: EncryptPayload<T>): Promise<T>;
+	    decryptData<T>(data: EncryptPayload<T>): T;
 	    /**
 	     * @param {string} value
 	     * @param {EncryptionType} encryptionType
-	     * @returns {Promise<string>}
+	     * @returns {string}
 	     *
 	     * @memberof Decryptor
 	     */
-	    decryptValue: (value: string, encryptionType: EncryptionType) => Promise<string>;
+	    decryptValue: (value: string, encryptionType: EncryptionType) => string;
 	    /**
 	     * @param {*} data
 	     * @param {EncryptionParameter} encryptionParameters
-	     * @returns {Promise<string[]>}
+	     * @returns {string[]}
 	     *
 	     * @memberof Decryptor
 	     */
-	    getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): Promise<string[]>;
+	    getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): string[];
 	    /**
 	     * @param {any} val
 	     * @param {string} encryptionType
@@ -210,7 +209,13 @@ declare module Morfina {
 	
 	
 	
-	 class MorfinaClient {
+	
+	/**
+	 * MorfinaClient
+	 *
+	 * @class MorfinaClient
+	 */
+	export class MorfinaClient {
 	    config: Config;
 	    computer: Computer;
 	    decryptor: Decryptor;
@@ -244,29 +249,29 @@ declare module Morfina {
 	    /**
 	     * Precompute values to make future invokations of encrypt significantly faster.
 	     * @param {number} numberOfPrimes
-	     * @returns {Promise<any>}
+	     * @returns {Promise<void>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    precompute: (numberOfPrimes: number) => Promise<void>;
 	    /**
 	     * Returns sum of value1 and value2
 	     * @param {string|number} value1
 	     * @param {string|number} value2
-	     * @returns {string}
+	     * @returns {Promise<string>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    add: (value1: string | number, value2: string | number) => string;
+	    add: (value1: string | number, value2: string | number) => Promise<string>;
 	    /**
 	     * Returns multiplication of value by num
 	     * @param {string} value
 	     * @param {number} num
-	     * @returns {string}
+	     * @returns {Promise<string>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    multiply: (value: string | number, num: number) => string;
+	    multiply: (value: string | number, num: number) => Promise<string>;
 	    /**
 	     * Returns decrypted data that is passed in encrypted
 	     * @param {EncryptPayload} data
@@ -292,11 +297,9 @@ declare module Morfina {
 	     */
 	    getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]>;
 	}
-	export default MorfinaClient;
 
 }
 declare module Morfina {
 	
-	export default MorfinaClient;
 
 }

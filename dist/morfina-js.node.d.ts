@@ -106,11 +106,11 @@ declare module 'morfina-js/Computer' {
 	    /**
 	     * Precompute values to make future invokations of encrypt significantly faster.
 	     * @param {number} numberOfPrimes
-	     * @returns {Promise<any>}
+	     * @returns {void}
 	     *
 	     * @memberof Computer
 	     */
-	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    precompute: (numberOfPrimes: number) => void;
 	    /**
 	     * Returns sum of value1 and value2
 	     * @param {string|number} value1
@@ -129,7 +129,6 @@ declare module 'morfina-js/Computer' {
 	     * @memberof Computer
 	     */
 	    multiply: (value: string | number, num: number) => string;
-	    encrypt: (x: any) => string;
 	    /**
 	     * If passed in value is string then it assumes that passed in value is encrypted so it creates BigInteger.
 	     * If passed in values is number then in returns decrypted BigInteger.
@@ -159,27 +158,27 @@ declare module 'morfina-js/Decryptor' {
 	    constructor(credentials: Credentials, publicKey: any, privateKey: any);
 	    /**
 	     * @param {EncryptPayload} data
-	     * @returns {Promise<any>}
+	     * @returns {T}
 	     *
 	     * @memberof Decryptor
 	     */
-	    decryptData<T>(data: EncryptPayload<T>): Promise<T>;
+	    decryptData<T>(data: EncryptPayload<T>): T;
 	    /**
 	     * @param {string} value
 	     * @param {EncryptionType} encryptionType
-	     * @returns {Promise<string>}
+	     * @returns {string}
 	     *
 	     * @memberof Decryptor
 	     */
-	    decryptValue: (value: string, encryptionType: EncryptionType) => Promise<string>;
+	    decryptValue: (value: string, encryptionType: EncryptionType) => string;
 	    /**
 	     * @param {*} data
 	     * @param {EncryptionParameter} encryptionParameters
-	     * @returns {Promise<string[]>}
+	     * @returns {string[]}
 	     *
 	     * @memberof Decryptor
 	     */
-	    getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): Promise<string[]>;
+	    getDecryptedValuesForPath(data: any, encryptionParameters: EncryptionParameter): string[];
 	    /**
 	     * @param {any} val
 	     * @param {string} encryptionType
@@ -210,7 +209,13 @@ declare module 'morfina-js/Client' {
 	import { Config, Credentials, AxiosResponse, EncryptPayload, EncryptPayloadWithoutApiKeys, EncryptionParameter, EncryptionType } from 'morfina-js/model';
 	import Computer from 'morfina-js/Computer';
 	import Decryptor from 'morfina-js/Decryptor';
-	import ApiClient from 'morfina-js/ApiClient'; class MorfinaClient {
+	import ApiClient from 'morfina-js/ApiClient';
+	/**
+	 * MorfinaClient
+	 *
+	 * @class MorfinaClient
+	 */
+	export class MorfinaClient {
 	    config: Config;
 	    computer: Computer;
 	    decryptor: Decryptor;
@@ -244,29 +249,29 @@ declare module 'morfina-js/Client' {
 	    /**
 	     * Precompute values to make future invokations of encrypt significantly faster.
 	     * @param {number} numberOfPrimes
-	     * @returns {Promise<any>}
+	     * @returns {Promise<void>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    precompute: (numberOfPrimes: number) => Promise<any>;
+	    precompute: (numberOfPrimes: number) => Promise<void>;
 	    /**
 	     * Returns sum of value1 and value2
 	     * @param {string|number} value1
 	     * @param {string|number} value2
-	     * @returns {string}
+	     * @returns {Promise<string>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    add: (value1: string | number, value2: string | number) => string;
+	    add: (value1: string | number, value2: string | number) => Promise<string>;
 	    /**
 	     * Returns multiplication of value by num
 	     * @param {string} value
 	     * @param {number} num
-	     * @returns {string}
+	     * @returns {Promise<string>}
 	     *
 	     * @memberof MorfinaClient
 	     */
-	    multiply: (value: string | number, num: number) => string;
+	    multiply: (value: string | number, num: number) => Promise<string>;
 	    /**
 	     * Returns decrypted data that is passed in encrypted
 	     * @param {EncryptPayload} data
@@ -292,12 +297,10 @@ declare module 'morfina-js/Client' {
 	     */
 	    getDecryptedValuesForPath<T = any>(data: T, encryptionParameters: EncryptionParameter): Promise<string[]>;
 	}
-	export default MorfinaClient;
 
 }
 declare module 'morfina-js/index' {
-	import MorfinaClient from 'morfina-js/Client';
-	export default MorfinaClient;
+	export * from 'morfina-js/Client';
 
 }
-declare module 'morfina-js'{ export * from 'morfina-js/morfina'}
+declare module 'morfina-js'{ export * from 'morfina-js/index'}
