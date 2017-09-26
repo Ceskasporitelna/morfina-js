@@ -3,8 +3,6 @@
 ## [Unreleased]
         
 ## [1.0.2] - 2017-09-26
-
-## [1.0.2] - 2017-09-26
 ### Changed
 - Update axios to v0.10.0
         
