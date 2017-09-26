@@ -23102,15 +23102,10 @@ var MorfinaJS =
 	var isAbsoluteURL = __webpack_require__(90);
 	var combineURLs = __webpack_require__(91);
 	var bind = __webpack_require__(92);
+	var transformData = __webpack_require__(85);
 	
 	function Axios(defaultConfig) {
-	  this.defaultConfig = utils.merge({
-	    headers: {},
-	    timeout: defaults.timeout,
-	    transformRequest: defaults.transformRequest,
-	    transformResponse: defaults.transformResponse
-	  }, defaultConfig);
-	
+	  this.defaults = utils.merge({}, defaultConfig);
 	  this.interceptors = {
 	    request: new InterceptorManager(),
 	    response: new InterceptorManager()
@@ -23126,14 +23121,36 @@ var MorfinaJS =
 	    }, arguments[1]);
 	  }
 	
-	  config = utils.merge(this.defaultConfig, { method: 'get' }, config);
+	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
 	
+	  // Support baseURL config
 	  if (config.baseURL && !isAbsoluteURL(config.url)) {
 	    config.url = combineURLs(config.baseURL, config.url);
 	  }
 	
 	  // Don't allow overriding defaults.withCredentials
-	  config.withCredentials = config.withCredentials || defaults.withCredentials;
+	  config.withCredentials = config.withCredentials || this.defaults.withCredentials;
+	
+	  // Transform request data
+	  config.data = transformData(
+	    config.data,
+	    config.headers,
+	    config.transformRequest
+	  );
+	
+	  // Flatten headers
+	  config.headers = utils.merge(
+	    config.headers.common || {},
+	    config.headers[config.method] || {},
+	    config.headers || {}
+	  );
+	
+	  utils.forEach(
+	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+	    function cleanHeaderConfig(method) {
+	      delete config.headers[method];
+	    }
+	  );
 	
 	  // Hook up interceptors middleware
 	  var chain = [dispatchRequest, undefined];
@@ -23154,25 +23171,23 @@ var MorfinaJS =
 	  return promise;
 	};
 	
-	var defaultInstance = new Axios();
-	
+	var defaultInstance = new Axios(defaults);
 	var axios = module.exports = bind(Axios.prototype.request, defaultInstance);
 	
+	// Expose properties from defaultInstance
+	axios.defaults = defaultInstance.defaults;
+	axios.interceptors = defaultInstance.interceptors;
+	
+	// Factory for creating new instances
 	axios.create = function create(defaultConfig) {
 	  return new Axios(defaultConfig);
 	};
-	
-	// Expose defaults
-	axios.defaults = defaults;
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
 	axios.spread = __webpack_require__(93);
-	
-	// Expose interceptors
-	axios.interceptors = defaultInstance.interceptors;
 	
 	// Provide aliases for supported request methods
 	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
@@ -23213,7 +23228,7 @@ var MorfinaJS =
 	};
 	
 	module.exports = {
-	  transformRequest: [function transformResponseJSON(data, headers) {
+	  transformRequest: [function transformRequestJSON(data, headers) {
 	    if (utils.isFormData(data)) {
 	      return data;
 	    }
@@ -23264,7 +23279,9 @@ var MorfinaJS =
 	  timeout: 0,
 	
 	  xsrfCookieName: 'XSRF-TOKEN',
-	  xsrfHeaderName: 'X-XSRF-TOKEN'
+	  xsrfHeaderName: 'X-XSRF-TOKEN',
+	
+	  maxContentLength: -1
 	};
 
 
@@ -23486,7 +23503,11 @@ var MorfinaJS =
 	function merge(/* obj1, obj2, obj3, ... */) {
 	  var result = {};
 	  function assignValue(val, key) {
-	    result[key] = val;
+	    if (typeof result[key] === 'object' && typeof val === 'object') {
+	      result[key] = merge(result[key], val);
+	    } else {
+	      result[key] = val;
+	    }
 	  }
 	
 	  for (var i = 0, l = arguments.length; i < l; i++) {
@@ -23530,12 +23551,21 @@ var MorfinaJS =
 	module.exports = function dispatchRequest(config) {
 	  return new Promise(function executor(resolve, reject) {
 	    try {
-	      if ((typeof XMLHttpRequest !== 'undefined') || (typeof ActiveXObject !== 'undefined')) {
+	      var adapter;
+	
+	      if (typeof config.adapter === 'function') {
+	        // For custom adapter support
+	        adapter = config.adapter;
+	      } else if (typeof XMLHttpRequest !== 'undefined') {
 	        // For browsers use XHR adapter
-	        __webpack_require__(82)(resolve, reject, config);
+	        adapter = __webpack_require__(82);
 	      } else if (typeof process !== 'undefined') {
 	        // For node use HTTP adapter
-	        __webpack_require__(82)(resolve, reject, config);
+	        adapter = __webpack_require__(82);
+	      }
+	
+	      if (typeof adapter === 'function') {
+	        adapter(resolve, reject, config);
 	      }
 	    } catch (e) {
 	      reject(e);
@@ -23550,44 +23580,32 @@ var MorfinaJS =
 /* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	/*global ActiveXObject:true*/
-	
-	var defaults = __webpack_require__(79);
 	var utils = __webpack_require__(80);
 	var buildURL = __webpack_require__(83);
 	var parseHeaders = __webpack_require__(84);
 	var transformData = __webpack_require__(85);
 	var isURLSameOrigin = __webpack_require__(86);
-	var btoa = window.btoa || __webpack_require__(87);
+	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(87);
 	
 	module.exports = function xhrAdapter(resolve, reject, config) {
-	  // Transform request data
-	  var data = transformData(
-	    config.data,
-	    config.headers,
-	    config.transformRequest
-	  );
+	  var requestData = config.data;
+	  var requestHeaders = config.headers;
 	
-	  // Merge headers
-	  var requestHeaders = utils.merge(
-	    defaults.headers.common,
-	    defaults.headers[config.method] || {},
-	    config.headers || {}
-	  );
-	
-	  if (utils.isFormData(data)) {
+	  if (utils.isFormData(requestData)) {
 	    delete requestHeaders['Content-Type']; // Let the browser set it
 	  }
 	
-	  var Adapter = (XMLHttpRequest || ActiveXObject);
+	  var request = new XMLHttpRequest();
 	  var loadEvent = 'onreadystatechange';
 	  var xDomain = false;
 	
 	  // For IE 8/9 CORS support
-	  if (!isURLSameOrigin(config.url) && window.XDomainRequest) {
-	    Adapter = window.XDomainRequest;
+	  // Only supports POST and GET calls and doesn't returns the response headers.
+	  // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+	  if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined' && window.XDomainRequest && !('withCredentials' in request) && !isURLSameOrigin(config.url)) {
+	    request = new window.XDomainRequest();
 	    loadEvent = 'onload';
 	    xDomain = true;
 	  }
@@ -23599,38 +23617,73 @@ var MorfinaJS =
 	    requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
 	  }
 	
-	  // Create the request
-	  var request = new Adapter('Microsoft.XMLHTTP');
 	  request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
 	
 	  // Set the request timeout in MS
 	  request.timeout = config.timeout;
 	
-	  // Listen for ready state
-	  request[loadEvent] = function handleReadyState() {
-	    if (request && (request.readyState === 4 || xDomain)) {
-	      // Prepare the response
-	      var responseHeaders = xDomain ? null : parseHeaders(request.getAllResponseHeaders());
-	      var responseData = ['text', ''].indexOf(config.responseType || '') !== -1 ? request.responseText : request.response;
-	      var response = {
-	        data: transformData(
-	          responseData,
-	          responseHeaders,
-	          config.transformResponse
-	        ),
-	        status: request.status,
-	        statusText: request.statusText,
-	        headers: responseHeaders,
-	        config: config
-	      };
-	      // Resolve or reject the Promise based on the status
-	      ((request.status >= 200 && request.status < 300) || (xDomain && request.responseText) ?
-	        resolve :
-	        reject)(response);
+	  // For IE 9 CORS support.
+	  request.onprogress = function handleProgress() {};
+	  request.ontimeout = function handleTimeout() {};
 	
-	      // Clean up request
-	      request = null;
+	  // Listen for ready state
+	  request[loadEvent] = function handleLoad() {
+	    if (!request || (request.readyState !== 4 && !xDomain)) {
+	      return;
 	    }
+	
+	    // The request errored out and we didn't get a response, this will be
+	    // handled by onerror instead
+	    if (request.status === 0) {
+	      return;
+	    }
+	
+	    // Prepare the response
+	    var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+	    var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+	    var response = {
+	      data: transformData(
+	        responseData,
+	        responseHeaders,
+	        config.transformResponse
+	      ),
+	      // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
+	      status: request.status === 1223 ? 204 : request.status,
+	      statusText: request.status === 1223 ? 'No Content' : request.statusText,
+	      headers: responseHeaders,
+	      config: config,
+	      request: request
+	    };
+	
+	    // Resolve or reject the Promise based on the status
+	    ((response.status >= 200 && response.status < 300) ||
+	     (!('status' in request) && request.responseText) ?
+	      resolve :
+	      reject)(response);
+	
+	    // Clean up request
+	    request = null;
+	  };
+	
+	  // Handle low level network errors
+	  request.onerror = function handleError() {
+	    // Real errors are hidden from us by the browser
+	    // onerror should only fire if it's a network error
+	    reject(new Error('Network Error'));
+	
+	    // Clean up request
+	    request = null;
+	  };
+	
+	  // Handle timeout
+	  request.ontimeout = function handleTimeout() {
+	    var err = new Error('timeout of ' + config.timeout + 'ms exceeded');
+	    err.timeout = config.timeout;
+	    err.code = 'ECONNABORTED';
+	    reject(err);
+	
+	    // Clean up request
+	    request = null;
 	  };
 	
 	  // Add xsrf header
@@ -23640,19 +23693,19 @@ var MorfinaJS =
 	    var cookies = __webpack_require__(88);
 	
 	    // Add xsrf header
-	    var xsrfValue =  config.withCredentials || isURLSameOrigin(config.url) ?
-	        cookies.read(config.xsrfCookieName || defaults.xsrfCookieName) :
+	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
+	        cookies.read(config.xsrfCookieName) :
 	        undefined;
 	
 	    if (xsrfValue) {
-	      requestHeaders[config.xsrfHeaderName || defaults.xsrfHeaderName] = xsrfValue;
+	      requestHeaders[config.xsrfHeaderName] = xsrfValue;
 	    }
 	  }
 	
 	  // Add headers to the request
-	  if (!xDomain) {
+	  if ('setRequestHeader' in request) {
 	    utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-	      if (!data && key.toLowerCase() === 'content-type') {
+	      if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
 	        // Remove Content-Type if data is undefined
 	        delete requestHeaders[key];
 	      } else {
@@ -23678,14 +23731,29 @@ var MorfinaJS =
 	    }
 	  }
 	
-	  if (utils.isArrayBuffer(data)) {
-	    data = new DataView(data);
+	  // Handle progress if needed
+	  if (config.progress) {
+	    if (config.method === 'post' || config.method === 'put') {
+	      request.upload.addEventListener('progress', config.progress);
+	    } else if (config.method === 'get') {
+	      request.addEventListener('progress', config.progress);
+	    }
+	  }
+	
+	  // Format request data
+	  if (utils.isArrayBuffer(requestData)) {
+	    requestData = new DataView(requestData);
+	  }
+	
+	  if (requestData === undefined) {
+	    requestData = null;
 	  }
 	
 	  // Send the request
-	  request.send(data);
+	  request.send(requestData);
 	};
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
 /* 83 */
@@ -23913,12 +23981,12 @@ var MorfinaJS =
 	
 	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 	
-	function InvalidCharacterError(message) {
-	  this.message = message;
+	function E() {
+	  this.message = 'String contains an invalid character';
 	}
-	InvalidCharacterError.prototype = new Error;
-	InvalidCharacterError.prototype.code = 5;
-	InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+	E.prototype = new Error;
+	E.prototype.code = 5;
+	E.prototype.name = 'InvalidCharacterError';
 	
 	function btoa(input) {
 	  var str = String(input);
@@ -23935,7 +24003,7 @@ var MorfinaJS =
 	  ) {
 	    charCode = str.charCodeAt(idx += 3 / 4);
 	    if (charCode > 0xFF) {
-	      throw new InvalidCharacterError('INVALID_CHARACTER_ERR: DOM Exception 5');
+	      throw new E();
 	    }
 	    block = block << 8 | charCode;
 	  }

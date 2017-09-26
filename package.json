@@ -1,6 +1,6 @@
 {
   "name": "morfina-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Morfina SDK",
   "main": "./dist/morfina-js.node.js",
   "types": "./dist/morfina-js.node.d.ts",
