@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+        
+## [1.0.3] - 2017-09-26
 ### Fixed
 - Move all code to lib in order to make generating types work
         
