@@ -268,6 +268,12 @@ aws4@^1.2.1:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
+axios@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.10.0.tgz#5b0ec0d5fb53e79b98b7bf84c0e9b1cf902fdfc4"
+  dependencies:
+    follow-redirects "0.0.7"
+
 axios@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.8.1.tgz#e0eafec0f346139527dc3b79fdcbff8034a24045"
