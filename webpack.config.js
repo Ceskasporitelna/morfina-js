@@ -43,7 +43,7 @@ module.exports = {
   node: {
     fs: "empty"
   },
-  entry: './src/index.ts',
+  entry: './lib/index.ts',
   output: {
     path: path.join(__dirname, 'build'),
     filename: outputFilename,

@@ -1,4 +1,4 @@
-import * as paillier from '../lib/paillier'
+import * as paillier from './paillier';
 import { BigInteger } from 'jsbn';
 import { Credentials } from './model';
 
