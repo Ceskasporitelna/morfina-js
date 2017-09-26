@@ -1,6 +1,6 @@
-import { MorfinaClient } from '../src';
-import { EncryptPayloadWithoutApiKeys, EncryptionType } from '../src/model';
-import { ApiClient } from '../src/ApiClient';
+import { MorfinaClient } from '../lib';
+import { EncryptPayloadWithoutApiKeys, EncryptionType } from '../lib/model';
+import { ApiClient } from '../lib/ApiClient';
 
 import * as CSCoreSDK from 'cs-core-sdk';
 var judge: CSCoreSDK.Judge = null;
