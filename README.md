@@ -44,15 +44,15 @@ If you just want to use the SDK, there are compiled files ready to be used in th
 You can just copy these files directly from the repository or preferably, use `npm` to install it into your project:
 
 ```
-npm install morfina --save
+npm install morfina-js --save
 
 ```
 
 ## Usage in browser
 For usage in browser, pickup the following files from the `/dist` folder:
-* `cs-morfina-sdk.sfx.js` - MorfinaJS packaged for browsers
-* `cs-morfina-sdk.sfx.d.ts` - MorfinaJS typings for browsers
-* `cs-morfina-sdk.sfx.js.map` - MorfinaJS sourcemap for browsers
+* `morfina-js.sfx.min.js` - MorfinaJS packaged for browsers
+* `morfina-js.sfx.d.ts` - MorfinaJS typings for browsers
+* `morfina-js.sfx.min.js.map` - MorfinaJS sourcemap for browsers
 
 The MorfinaJS SDK will be available in global variable `Morfina`.
 
@@ -64,7 +64,7 @@ For usage in node, install it through `npm` (see above). You can then require it
 
 ```javascript
 
-var Morfina = require('morfina');
+var Morfina = require('morfina-js');
 
 ``` 
 
