@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Fixed
+- Update README.md
         
 ## [1.0.3] - 2017-09-26
 ### Fixed
