@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+        
+## [1.0.4] - 2017-10-20
 ### Fixed
 - Update README.md
         
